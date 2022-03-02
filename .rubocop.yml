@@ -1,0 +1,30 @@
+AllCops:
+  TargetRubyVersion: 2.5
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'vendor/**/*' # Github Actions
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/HashAsLastArrayItem:
+  Enabled: false
