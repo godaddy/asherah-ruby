@@ -123,9 +123,9 @@ module Asherah
       data_buffer = string_to_cbuffer(data)
       output_encrypted_data_buffer = allocate_cbuffer(data.length + 256)
       output_encrypted_key_buffer = allocate_cbuffer(256)
-      output_created_buffer = int64_to_buffer(0)
+      output_created_buffer = int_to_buffer(0)
       output_parent_key_id_buffer = allocate_cbuffer(256)
-      output_parent_key_created_buffer = int64_to_buffer(0)
+      output_parent_key_created_buffer = int_to_buffer(0)
 
       result = Encrypt(
         partition_id_buffer,
@@ -145,10 +145,10 @@ module Asherah
         data: cbuffer_to_string(output_encrypted_data_buffer),
         key: {
           encrypted_key: cbuffer_to_string(output_encrypted_key_buffer),
-          created: buffer_to_int64(output_created_buffer),
+          created: buffer_to_int(output_created_buffer),
           parent_key_meta: {
             id: parent_key_id,
-            created: buffer_to_int64(output_parent_key_created_buffer)
+            created: buffer_to_int(output_parent_key_created_buffer)
           }
         }
       }
@@ -182,18 +182,6 @@ module Asherah
       Error.check_result!('decrypt', result)
 
       cbuffer_to_string(output_data_buffer)
-    end
-
-    private
-
-    def int64_to_buffer(number)
-      buffer_ptr = FFI::MemoryPointer.new(1, Cobhan::SIZEOF_INT32 * 2, false)
-      buffer_ptr.put_int64(0, number)
-      buffer_ptr
-    end
-
-    def buffer_to_int64(buffer_ptr)
-      buffer_ptr.get_int64(0)
     end
   end
 end

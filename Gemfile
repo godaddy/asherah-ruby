@@ -10,3 +10,5 @@ gem 'rake', '~> 13.0'
 gem 'rspec', '~> 3.0'
 
 gem 'rubocop', '~> 1.21'
+
+gem 'cobhan', git: 'https://github.com/godaddy/cobhan-ruby.git', branch: 'int_to_buffer'
