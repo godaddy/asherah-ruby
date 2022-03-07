@@ -14,10 +14,10 @@ RuboCop::RakeTask.new
 task default: %i[spec rubocop]
 
 DISTRIBUTIONS = {
-  # 'x86_64-linux' => ['libasherah-x64.so'],
+  'x86_64-linux' => ['libasherah-x64.so'],
   'x86_64-darwin' => ['libasherah-x64.dylib'],
-  # 'aarch64-linux' => ['libasherah-arm64.so'],
-  # 'arm64-darwin' => ['libasherah-arm64.dylib']
+  'aarch64-linux' => ['libasherah-arm64.so'],
+  'arm64-darwin' => ['libasherah-arm64.dylib']
 }
 
 def native_build(platform, native_files)
