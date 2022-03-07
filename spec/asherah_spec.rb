@@ -6,7 +6,7 @@ RSpec.describe Asherah do
     kms_type: 'static',
     metastore: 'memory',
     service_name: 'gem',
-    product_id: 'sable',
+    product_id: 'sable'
   }
 
   before :all do

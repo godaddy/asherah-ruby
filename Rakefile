@@ -3,7 +3,7 @@
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubygems/package'
-require "open-uri"
+require 'open-uri'
 
 RSpec::Core::RakeTask.new(:spec)
 
@@ -18,7 +18,7 @@ DISTRIBUTIONS = {
   'x86_64-darwin' => ['libasherah-x64.dylib'],
   'aarch64-linux' => ['libasherah-arm64.so'],
   'arm64-darwin' => ['libasherah-arm64.dylib']
-}
+}.freeze
 
 def native_build(platform, native_files)
   puts "Building gem for #{platform}"
@@ -49,10 +49,10 @@ def native_build(platform, native_files)
       native_file_path = File.join(native_dir, native_file)
       gemspec.files << native_file_path
 
-      URI.open(native_file_path, 'wb') do |file|
+      File.open(native_file_path, 'wb') do |file|
         url = "https://github.com/godaddy/asherah-cobhan/releases/download/current/#{native_file}"
         puts "Downloading #{url}"
-        file << URI.open(url).read
+        file << URI.parse(url).open.read
       end
     end
 
@@ -61,10 +61,9 @@ def native_build(platform, native_files)
   end
 end
 
-
 namespace :native do
   namespace :build do
-    desc "Build all native gems"
+    desc 'Build all native gems'
     task :all do
       DISTRIBUTIONS.each do |platform, native_files|
         native_build(platform, native_files)
@@ -83,15 +82,15 @@ namespace :native do
     require 'cobhan'
 
     filename = Class.new.extend(Cobhan).library_file_name('libasherah')
-    platform, _ = DISTRIBUTIONS.detect { |k, v| v.include?(filename) }
+    platform, _files = DISTRIBUTIONS.detect { |_k, v| v.include?(filename) }
 
     desc "Smoke test native gem on #{platform} platform"
-    task :"#{platform}" => :"build:#{platform}" do
+    task "#{platform}": :"build:#{platform}" do
       gemspec = Bundler.load_gemspec('asherah.gemspec')
       gemspec.platform = Gem::Platform.new(platform)
 
       sh("gem install pkg/#{gemspec.file_name}")
-      sh("ruby spec/smoke_test.rb")
+      sh('ruby spec/smoke_test.rb')
     end
   end
 end

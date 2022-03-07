@@ -1,5 +1,7 @@
+# frozen_string_literal: true
 
 module Asherah
+  # Asherah Error converts the error code to error message
   module Error
     ResultError = Class.new(StandardError)
 
@@ -9,13 +11,13 @@ module Asherah
       -102 => 'get session failed',
       -103 => 'encrypt failed',
       -104 => 'eecrypt failed'
-    }
+    }.freeze
 
     def self.check_result!(scope, result)
-      if result.negative?
-        error_message = Error::CODES.fetch(result) { 'unrecognized' }
-        raise Error::ResultError.new("#{scope} failed: #{error_message}")
-      end
+      return unless result.negative?
+
+      error_message = Error::CODES.fetch(result, 'unrecognized')
+      raise Error::ResultError, "#{scope} failed: #{error_message}"
     end
   end
 end
