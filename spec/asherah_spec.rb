@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Asherah do
-  let(:partition_id) { 'user_1' }
+  partition_id = 'user_1'
   setup_options = {
     kms_type: 'static',
     metastore: 'memory',
