@@ -11,7 +11,7 @@ on:
 jobs:
   native:
     runs-on: ${{ matrix.os }}
-    name: native ${{ matrix.os }} ruby-${{ matrix.ruby }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }}
     strategy:
       matrix:
         include:
@@ -45,12 +45,12 @@ jobs:
 
   native_arm64:
     runs-on: ${{ matrix.os }}
-    name: native ${{ matrix.os }} ruby-${{ matrix.ruby }} arm32
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} arm32
     strategy:
       matrix:
         include:
           - { os: ubuntu-20.04 , platform: aarch64-linux , ruby: 3.0 }
-          # - { os: macos-11 , platform: arm64-darwin , ruby: 3.0 }
+          - { os: macos-11 , platform: arm64-darwin , ruby: 3.0 }
       fail-fast: false
 
     steps:
@@ -68,6 +68,7 @@ jobs:
           bundle exec rake native:build:${{ matrix.platform }}
 
       - name: Install native gem and run smoke tests
+        if: matrix.platform == 'aarch64-linux' # skip smoke tests for arm64-darwin
         shell: bash
         run: |
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
