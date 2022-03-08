@@ -62,14 +62,14 @@ def native_build(platform, native_files)
 end
 
 namespace :native do
-  namespace :build do
-    desc 'Build all native gems'
-    task :all do
-      DISTRIBUTIONS.each do |platform, native_files|
-        native_build(platform, native_files)
-      end
+  desc 'Build all native gems'
+  task :build do
+    DISTRIBUTIONS.each do |platform, native_files|
+      native_build(platform, native_files)
     end
+  end
 
+  namespace :build do
     DISTRIBUTIONS.each do |platform, native_files|
       desc "Build native gem for #{platform}"
       task :"#{platform}" do
