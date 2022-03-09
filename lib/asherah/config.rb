@@ -3,24 +3,24 @@
 require 'json'
 
 module Asherah
-  # @attr [String] kms_type
-  # @attr [String] metastore
-  # @attr [String] service_name
-  # @attr [String] product_id
-  # @attr [String] rdbms_connection_string
-  # @attr [String] dynamo_db_endpoint
-  # @attr [String] dynamo_db_region
-  # @attr [String] dynamo_db_table_name
-  # @attr [Boolean] enable_region_suffix
-  # @attr [String] preferred_region
-  # @attr [String] region_map
-  # @attr [Integer] session_cache_max_size
-  # @attr [Integer] session_cache_duration
-  # @attr [Integer] expire_after
-  # @attr [Integer] check_interval
-  # @attr [Boolean] verbose
-  # @attr [Boolean] session_cache
-  # @attr [Boolean] debug_output
+  # @attr [String] kms_type, The master key management service (static or kms)
+  # @attr [String] metastore, The type of metastore for persisting keys (rdbms, dynamodb, memory)
+  # @attr [String] service_name, The name of this service
+  # @attr [String] product_id, The name of the product that owns this service
+  # @attr [String] rdbms_connection_string, The database connection string (required when metastore is rdbms)
+  # @attr [String] dynamo_db_endpoint, An optional endpoint URL (only supported for dynamodb metastore)
+  # @attr [String] dynamo_db_region, The AWS region for DynamoDB requests (only supported for dynamodb metastore)
+  # @attr [String] dynamo_db_table_name, The table name for DynamoDB (only supported for dynamodb metastore)
+  # @attr [Boolean] enable_region_suffix, Configure the metastore to use regional suffixes (only supported for dynamodb metastore)
+  # @attr [String] preferred_region, The preferred AWS region (required if kms_type is aws)
+  # @attr [String] region_map, A comma separated list of key-value pairs in the form of REGION1=ARN1[,REGION2=ARN2] (required if kms_type is aws)
+  # @attr [Integer] session_cache_max_size, The maximum number of sessions to cache
+  # @attr [Integer] session_cache_duration, The amount of time in seconds a session will remain cached
+  # @attr [Integer] expire_after, The amount of time in seconds a key is considered valid
+  # @attr [Integer] check_interval, The amount of time in seconds before cached keys are considered stale
+  # @attr [Boolean] verbose, Enable verbose logging output
+  # @attr [Boolean] session_cache, Enable shared session caching
+  # @attr [Boolean] debug_output< Enable debug output
   class Config
     attr_accessor  \
       :kms_type,
