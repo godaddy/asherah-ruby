@@ -14,6 +14,10 @@ module Asherah
   # @attr [Boolean] enable_region_suffix
   # @attr [String] preferred_region
   # @attr [String] region_map
+  # @attr [Integer] session_cache_max_size
+  # @attr [Integer] session_cache_duration
+  # @attr [Integer] expire_after
+  # @attr [Integer] check_interval
   # @attr [Boolean] verbose
   # @attr [Boolean] session_cache
   # @attr [Boolean] debug_output
@@ -30,6 +34,10 @@ module Asherah
       :enable_region_suffix,
       :preferred_region,
       :region_map,
+      :session_cache_max_size,
+      :session_cache_duration,
+      :expire_after,
+      :check_interval,
       :verbose,
       :session_cache,
       :debug_output
@@ -57,6 +65,10 @@ module Asherah
         c[:enableRegionSuffix] = enable_region_suffix
         c[:preferredRegion] = preferred_region if preferred_region
         c[:regionMapStr] = region_map if region_map
+        c[:sessionCacheMaxSize] = session_cache_max_size if session_cache_max_size
+        c[:sessionCacheDuration] = session_cache_duration if session_cache_duration
+        c[:expireAfter] = expire_after if expire_after
+        c[:checkInterval] = check_interval if check_interval
       end
 
       JSON.generate(config, *args)
