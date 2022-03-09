@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'asherah/version'
+require 'asherah/config'
 require 'asherah/error'
 require 'asherah/key_meta'
 require 'asherah/data_row_record'
@@ -13,84 +14,23 @@ module Asherah
 
   LIB_ROOT_PATH = File.expand_path('asherah/native', __dir__)
   load_library(LIB_ROOT_PATH, 'libasherah', [
-    [
-      :Setup,
-      [
-        :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :int32,
-        :pointer, :pointer, :pointer, :pointer, :int32, :int32, :int32
-      ],
-      :int32
-    ],
+    [:SetupJson, [:pointer], :int32],
     [:Encrypt, [:pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :int32],
     [:Decrypt, [:pointer, :pointer, :pointer, :int64, :pointer, :int64, :pointer], :int32]
   ].freeze)
 
   class << self
-    # Initializes Asherah encryption session
+    # Configures Asherah
     #
-    # @param kms_type [String]
-    # @param metastore [String]
-    # @param service_name [String]
-    # @param product_id [String]
-    # @param rdbms_connection_string [String]
-    # @param dynamo_db_endpoint [String]
-    # @param dynamo_db_region [String]
-    # @param dynamo_db_table_name [String]
-    # @param enable_region_suffix [Boolean]
-    # @param preferred_region [String]
-    # @param region_map [String]
-    # @param verbose [Boolean]
-    # @param session_cache [Boolean]
-    # @param debug_output [Boolean]
-    def setup(
-      kms_type:,
-      metastore:,
-      service_name:,
-      product_id:,
-      rdbms_connection_string: '',
-      dynamo_db_endpoint: '',
-      dynamo_db_region: '',
-      dynamo_db_table_name: '',
-      enable_region_suffix: false,
-      preferred_region: '',
-      region_map: '',
-      verbose: false,
-      session_cache: false,
-      debug_output: false
-    )
-      kms_type_buffer = string_to_cbuffer(kms_type)
-      metastore_buffer = string_to_cbuffer(metastore)
-      rdbms_connection_string_buffer = string_to_cbuffer(rdbms_connection_string)
-      dynamo_db_endpoint_buffer = string_to_cbuffer(dynamo_db_endpoint)
-      dynamo_db_region_buffer = string_to_cbuffer(dynamo_db_region)
-      dynamo_db_table_name_buffer = string_to_cbuffer(dynamo_db_table_name)
-      enable_region_suffix_int = enable_region_suffix ? 1 : 0
-      service_name_buffer = string_to_cbuffer(service_name)
-      product_id_buffer = string_to_cbuffer(product_id)
-      preferred_region_buffer = string_to_cbuffer(preferred_region)
-      region_map_buffer = string_to_cbuffer(region_map)
-      verbose_int = verbose ? 1 : 0
-      session_cache_int = session_cache ? 1 : 0
-      debug_output_int = debug_output ? 1 : 0
+    # @yield [Config]
+    # @return [void]
+    def configure
+      yield config
 
-      result = Setup(
-        kms_type_buffer,
-        metastore_buffer,
-        rdbms_connection_string_buffer,
-        dynamo_db_endpoint_buffer,
-        dynamo_db_region_buffer,
-        dynamo_db_table_name_buffer,
-        enable_region_suffix_int,
-        service_name_buffer,
-        product_id_buffer,
-        preferred_region_buffer,
-        region_map_buffer,
-        verbose_int,
-        session_cache_int,
-        debug_output_int
-      )
+      config_buffer = string_to_cbuffer(config.to_json)
+      result = SetupJson(config_buffer)
 
-      Error.check_result!('setup', result)
+      Error.check_result!(result, 'SetupJson failed')
     end
 
     # Encrypts data for a given partition_id
@@ -117,7 +57,7 @@ module Asherah
         output_parent_key_created_buffer
       )
 
-      Error.check_result!('encrypt', result)
+      Error.check_result!(result, 'Encrypt failed')
 
       parent_key_meta = KeyMeta.new(
         id: cbuffer_to_string(output_parent_key_id_buffer),
@@ -160,9 +100,15 @@ module Asherah
         output_data_buffer
       )
 
-      Error.check_result!('decrypt', result)
+      Error.check_result!(result, 'Decrypt failed')
 
       cbuffer_to_string(output_data_buffer)
+    end
+
+    private
+
+    def config
+      @config ||= Config.new
     end
   end
 end
