@@ -2,32 +2,12 @@
 
 require_relative 'asherah/version'
 require 'asherah/error'
+require 'asherah/key_meta'
+require 'asherah/data_row_record'
+require 'asherah/envelope_key_record'
 require 'cobhan'
 
-# Asherah uses the following data structures: `data_row_record`, `envelope_key_record`, and `key_meta`.
-#
-# `data_row_record` contains the encrypted key and provided data, as well as the information
-# required to decrypt the key encryption key. This struct should be stored in your
-# data persistence as it's required to decrypt data.
-#
-# data_row_record [Hash]
-#   key [Hash], envelope_key_record
-#   data [String]
-#
-# `envelope_key_record` represents an encrypted key and is the data structure used
-# to persist the key in our key table. It also contains the meta data
-# of the key used to encrypt it.
-#
-# envelope_key_record [Hash]
-#   created [Integer]
-#   encrypted_key [String]
-#   parent_key_meta [Hash], key_meta
-#
-# `key_meta` contains the `id` and `created` timestamp for an encryption key.
-#
-# key_meta [Hash]
-#   id [String]
-#   created [Integer]
+# Asherah is a Ruby wrapper around Asherah Go application-layer encryption SDK.
 module Asherah
   extend Cobhan
 
@@ -117,7 +97,7 @@ module Asherah
     #
     # @param partition_id [String]
     # @param data [String]
-    # @return [Hash], data_row_record
+    # @return [DataRowRecord]
     def encrypt(partition_id, data)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
@@ -139,33 +119,34 @@ module Asherah
 
       Error.check_result!('encrypt', result)
 
-      parent_key_id = cbuffer_to_string(output_parent_key_id_buffer)
+      parent_key_meta = KeyMeta.new(
+        id: cbuffer_to_string(output_parent_key_id_buffer),
+        created: buffer_to_int(output_parent_key_created_buffer)
+      )
+      envelope_key_record = EnvelopeKeyRecord.new(
+        encrypted_key: cbuffer_to_string(output_encrypted_key_buffer),
+        created: buffer_to_int(output_created_buffer),
+        parent_key_meta: parent_key_meta
+      )
 
-      {
+      DataRowRecord.new(
         data: cbuffer_to_string(output_encrypted_data_buffer),
-        key: {
-          encrypted_key: cbuffer_to_string(output_encrypted_key_buffer),
-          created: buffer_to_int(output_created_buffer),
-          parent_key_meta: {
-            id: parent_key_id,
-            created: buffer_to_int(output_parent_key_created_buffer)
-          }
-        }
-      }
+        key: envelope_key_record
+      )
     end
 
     # Decrypts a data_row_record for a partition_id
     #
     # @param partition_id [String]
-    # @param data_row_record [Hash], data_row_record
+    # @param data_row_record [DataRowRecord]
     # @return [String]
     def decrypt(partition_id, data_row_record)
       partition_id_buffer = string_to_cbuffer(partition_id)
-      encrypted_data_buffer = string_to_cbuffer(data_row_record[:data])
-      encrypted_key_buffer = string_to_cbuffer(data_row_record[:key][:encrypted_key])
-      created = data_row_record[:key][:created]
-      parent_key_id_buffer = string_to_cbuffer(data_row_record[:key][:parent_key_meta][:id])
-      parent_key_created = data_row_record[:key][:parent_key_meta][:created]
+      encrypted_data_buffer = string_to_cbuffer(data_row_record.data)
+      encrypted_key_buffer = string_to_cbuffer(data_row_record.key.encrypted_key)
+      created = data_row_record.key.created
+      parent_key_id_buffer = string_to_cbuffer(data_row_record.key.parent_key_meta.id)
+      parent_key_created = data_row_record.key.parent_key_meta.created
 
       output_data_buffer = allocate_cbuffer(encrypted_data_buffer.size + 256)
 

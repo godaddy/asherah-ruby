@@ -1,0 +1,79 @@
+name: Native
+
+on:
+  pull_request:
+    branches:
+      - "*"
+  push:
+    branches:
+      - main
+
+jobs:
+  native:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }}
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-20.04 , platform: x86_64-linux , ruby: 3.0 }
+          - { os: macos-11 , platform: x86_64-darwin , ruby: 3.0 }
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: default
+          bundler-cache: true
+
+      - name: Build native gem
+        run: |
+          bundle exec rake native:build:${{ matrix.platform }}
+
+      - name: Install native gem
+        run: |
+          gem install pkg/*-${{ matrix.platform }}.gem
+
+      - name: Run smoke tests
+        run: |
+          gem install rspec -v 3.11.0
+          # Don't run with `bundle exec` in order to load the installed gem.
+          ruby spec/smoke_test.rb
+
+  native_arm64:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} arm32
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-20.04 , platform: aarch64-linux , ruby: 3.0 }
+          - { os: macos-11 , platform: arm64-darwin , ruby: 3.0 }
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: default
+          bundler-cache: true
+
+      - name: Build native gem
+        run: |
+          bundle exec rake native:build:${{ matrix.platform }}
+
+      - name: Install native gem and run smoke tests
+        if: matrix.platform == 'aarch64-linux' # skip smoke tests for arm64-darwin
+        shell: bash
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker run --rm --volume "$(pwd):/asherah" \
+            --platform linux/arm64/v8 \
+            --workdir /asherah \
+            ruby:${{matrix.ruby}}-bullseye \
+            /bin/sh -c "gem install pkg/*-${{ matrix.platform }}.gem; gem install rspec -v 3.11.0; ruby spec/smoke_test.rb"

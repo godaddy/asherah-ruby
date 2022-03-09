@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Asherah do
-  let(:partition_id) { 'user_1' }
+  partition_id = 'user_1'
   setup_options = {
     kms_type: 'static',
     metastore: 'memory',
@@ -19,8 +19,8 @@ RSpec.describe Asherah do
 
   it 'encrypts and decrypts data' do
     data = 'test'
-    data_row = Asherah.encrypt(partition_id, data)
-    expect(Asherah.decrypt(partition_id, data_row)).to eq(data)
+    data_row_record = Asherah.encrypt(partition_id, data)
+    expect(Asherah.decrypt(partition_id, data_row_record)).to eq(data)
   end
 
   it 'raises error when already initialized' do
