@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'asherah/version'
+require 'asherah/config'
 require 'asherah/error'
 require 'asherah/key_meta'
 require 'asherah/data_row_record'
 require 'asherah/envelope_key_record'
 require 'cobhan'
-require 'json'
 
 # Asherah is a Ruby wrapper around Asherah Go application-layer encryption SDK.
 module Asherah
@@ -20,55 +20,12 @@ module Asherah
   ].freeze)
 
   class << self
-    # Initializes Asherah encryption session
+    # Configures Asherah
     #
-    # @param kms_type [String]
-    # @param metastore [String]
-    # @param service_name [String]
-    # @param product_id [String]
-    # @param rdbms_connection_string [String]
-    # @param dynamo_db_endpoint [String]
-    # @param dynamo_db_region [String]
-    # @param dynamo_db_table_name [String]
-    # @param enable_region_suffix [Boolean]
-    # @param preferred_region [String]
-    # @param region_map [String]
-    # @param verbose [Boolean]
-    # @param session_cache [Boolean]
-    # @param debug_output [Boolean]
-    def setup(
-      kms_type:,
-      metastore:,
-      service_name:,
-      product_id:,
-      rdbms_connection_string: nil,
-      dynamo_db_endpoint: nil,
-      dynamo_db_region: nil,
-      dynamo_db_table_name: nil,
-      enable_region_suffix: false,
-      preferred_region: nil,
-      region_map: nil,
-      verbose: false,
-      session_cache: false,
-      debug_output: false
-    )
-      config = {
-        kmsType: kms_type,
-        metaStore: metastore,
-        serviceName: service_name,
-        productId: product_id,
-        verbose: verbose,
-        sessionCache: session_cache,
-        debugOutput: debug_output
-      }.tap do |c|
-        c[:rdbmsConnectionString] = rdbms_connection_string if rdbms_connection_string
-        c[:dynamoDbEndpoint] = dynamo_db_endpoint if dynamo_db_endpoint
-        c[:dynamoDbRegion] = dynamo_db_region if dynamo_db_region
-        c[:dynamoDbTableName] = dynamo_db_table_name if dynamo_db_table_name
-        c[:enableRegionSuffix] = enable_region_suffix
-        c[:preferredRegion] = preferred_region if preferred_region
-        c[:regionMapStr] = region_map if region_map
-      end
+    # @yield [Config]
+    # @return [void]
+    def configure
+      yield config
 
       config_buffer = string_to_cbuffer(config.to_json)
       result = SetupJson(config_buffer)
@@ -146,6 +103,12 @@ module Asherah
       Error.check_result!('decrypt', result)
 
       cbuffer_to_string(output_data_buffer)
+    end
+
+    private
+
+    def config
+      @config ||= Config.new
     end
   end
 end

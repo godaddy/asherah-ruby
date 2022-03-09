@@ -30,15 +30,15 @@ gem install asherah
 
 ## Usage
 
-Initialize Asherah:
+Configure Asherah:
 
 ```ruby
-Asherah.setup({
-  kms_type: 'static',
-  metastore: 'memory',
-  service_name: 'gem',
-  product_id: 'sable'
-})
+Asherah.configure do |config|
+  config.kms_type = 'static'
+  config.metastore = 'memory'
+  config.service_name = 'gem'
+  config.product_id = 'sable'
+end
 ```
 
 Encrypt some data for a `partition_id`
