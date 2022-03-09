@@ -20,7 +20,7 @@ module Asherah
   # @attr [Integer] check_interval, The amount of time in seconds before cached keys are considered stale
   # @attr [Boolean] verbose, Enable verbose logging output
   # @attr [Boolean] session_cache, Enable shared session caching
-  # @attr [Boolean] debug_output< Enable debug output
+  # @attr [Boolean] debug_output, Enable debug output
   class Config
     attr_accessor  \
       :kms_type,
