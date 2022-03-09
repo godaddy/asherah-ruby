@@ -9,6 +9,7 @@ RSpec.describe Asherah do
       config.metastore = 'memory'
       config.service_name = 'gem'
       config.product_id = 'sable'
+      # config.debug_output = true
     end
   end
 
@@ -27,8 +28,8 @@ RSpec.describe Asherah do
       Asherah.configure do |config|
         config.kms_type = 'static'
       end
-    }.to raise_error(Asherah::Error::ResultError) do |e|
-      expect(e.message).to eq('setup failed: already initialized')
+    }.to raise_error(Asherah::Error::AlreadyInitialized) do |e|
+      expect(e.message).to eq('SetupJson failed')
     end
   end
 end

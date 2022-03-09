@@ -30,7 +30,7 @@ module Asherah
       config_buffer = string_to_cbuffer(config.to_json)
       result = SetupJson(config_buffer)
 
-      Error.check_result!('setup', result)
+      Error.check_result!(result, 'SetupJson failed')
     end
 
     # Encrypts data for a given partition_id
@@ -57,7 +57,7 @@ module Asherah
         output_parent_key_created_buffer
       )
 
-      Error.check_result!('encrypt', result)
+      Error.check_result!(result, 'Encrypt failed')
 
       parent_key_meta = KeyMeta.new(
         id: cbuffer_to_string(output_parent_key_id_buffer),
@@ -100,7 +100,7 @@ module Asherah
         output_data_buffer
       )
 
-      Error.check_result!('decrypt', result)
+      Error.check_result!(result, 'Decrypt failed')
 
       cbuffer_to_string(output_data_buffer)
     end
