@@ -6,6 +6,7 @@ require 'asherah/key_meta'
 require 'asherah/data_row_record'
 require 'asherah/envelope_key_record'
 require 'cobhan'
+require 'json'
 
 # Asherah is a Ruby wrapper around Asherah Go application-layer encryption SDK.
 module Asherah
@@ -13,14 +14,7 @@ module Asherah
 
   LIB_ROOT_PATH = File.expand_path('asherah/native', __dir__)
   load_library(LIB_ROOT_PATH, 'libasherah', [
-    [
-      :Setup,
-      [
-        :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :int32,
-        :pointer, :pointer, :pointer, :pointer, :int32, :int32, :int32
-      ],
-      :int32
-    ],
+    [:SetupJson, [:pointer], :int32],
     [:Encrypt, [:pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :int32],
     [:Decrypt, [:pointer, :pointer, :pointer, :int64, :pointer, :int64, :pointer], :int32]
   ].freeze)
@@ -47,48 +41,37 @@ module Asherah
       metastore:,
       service_name:,
       product_id:,
-      rdbms_connection_string: '',
-      dynamo_db_endpoint: '',
-      dynamo_db_region: '',
-      dynamo_db_table_name: '',
+      rdbms_connection_string: nil,
+      dynamo_db_endpoint: nil,
+      dynamo_db_region: nil,
+      dynamo_db_table_name: nil,
       enable_region_suffix: false,
-      preferred_region: '',
-      region_map: '',
+      preferred_region: nil,
+      region_map: nil,
       verbose: false,
       session_cache: false,
       debug_output: false
     )
-      kms_type_buffer = string_to_cbuffer(kms_type)
-      metastore_buffer = string_to_cbuffer(metastore)
-      rdbms_connection_string_buffer = string_to_cbuffer(rdbms_connection_string)
-      dynamo_db_endpoint_buffer = string_to_cbuffer(dynamo_db_endpoint)
-      dynamo_db_region_buffer = string_to_cbuffer(dynamo_db_region)
-      dynamo_db_table_name_buffer = string_to_cbuffer(dynamo_db_table_name)
-      enable_region_suffix_int = enable_region_suffix ? 1 : 0
-      service_name_buffer = string_to_cbuffer(service_name)
-      product_id_buffer = string_to_cbuffer(product_id)
-      preferred_region_buffer = string_to_cbuffer(preferred_region)
-      region_map_buffer = string_to_cbuffer(region_map)
-      verbose_int = verbose ? 1 : 0
-      session_cache_int = session_cache ? 1 : 0
-      debug_output_int = debug_output ? 1 : 0
+      config = {
+        kmsType: kms_type,
+        metaStore: metastore,
+        serviceName: service_name,
+        productId: product_id,
+        verbose: verbose,
+        sessionCache: session_cache,
+        debugOutput: debug_output
+      }.tap do |c|
+        c[:rdbmsConnectionString] = rdbms_connection_string if rdbms_connection_string
+        c[:dynamoDbEndpoint] = dynamo_db_endpoint if dynamo_db_endpoint
+        c[:dynamoDbRegion] = dynamo_db_region if dynamo_db_region
+        c[:dynamoDbTableName] = dynamo_db_table_name if dynamo_db_table_name
+        c[:enableRegionSuffix] = enable_region_suffix
+        c[:preferredRegion] = preferred_region if preferred_region
+        c[:regionMapStr] = region_map if region_map
+      end
 
-      result = Setup(
-        kms_type_buffer,
-        metastore_buffer,
-        rdbms_connection_string_buffer,
-        dynamo_db_endpoint_buffer,
-        dynamo_db_region_buffer,
-        dynamo_db_table_name_buffer,
-        enable_region_suffix_int,
-        service_name_buffer,
-        product_id_buffer,
-        preferred_region_buffer,
-        region_map_buffer,
-        verbose_int,
-        session_cache_int,
-        debug_output_int
-      )
+      config_buffer = string_to_cbuffer(config.to_json)
+      result = SetupJson(config_buffer)
 
       Error.check_result!('setup', result)
     end
