@@ -5,10 +5,10 @@ RSpec.describe Asherah do
 
   before :all do
     Asherah.configure do |config|
-      config.kms = 'static'
-      config.metastore = 'memory'
       config.service_name = 'gem'
       config.product_id = 'sable'
+      config.kms = 'static'
+      config.metastore = 'memory'
       # config.verbose = true
     end
   end

@@ -27,6 +27,8 @@ module Asherah
     def configure
       yield config
 
+      config.validate!
+
       config_buffer = string_to_cbuffer(config.to_json)
       result = SetupJson(config_buffer)
 

@@ -3,10 +3,10 @@
 require 'json'
 
 module Asherah
-  # @attr [String] kms, The master key management service (static or kms)
-  # @attr [String] metastore, The type of metastore for persisting keys (rdbms, dynamodb, memory)
   # @attr [String] service_name, The name of this service
   # @attr [String] product_id, The name of the product that owns this service
+  # @attr [String] kms, The master key management service (static or kms)
+  # @attr [String] metastore, The type of metastore for persisting keys (rdbms, dynamodb, memory)
   # @attr [String] connection_string, The database connection string (required when metastore is rdbms)
   # @attr [String] replica_read_consistency, For Aurora sessions using write forwarding (eventual, global, session)
   # @attr [String] dynamo_db_endpoint, An optional endpoint URL (for dynamodb metastore)
@@ -23,10 +23,10 @@ module Asherah
   # @attr [Boolean] verbose, Enable verbose logging output
   class Config
     MAPPING = {
-      kms: :KMS,
-      metastore: :Metastore,
       service_name: :ServiceName,
       product_id: :ProductID,
+      kms: :KMS,
+      metastore: :Metastore,
       connection_string: :ConnectionString,
       replica_read_consistency: :ReplicaReadConsistency,
       dynamo_db_endpoint: :DynamoDBEndpoint,
@@ -43,7 +43,18 @@ module Asherah
       verbose: :Verbose
     }.freeze
 
+    KMS_TYPES = ['static', 'kms'].freeze
+    METASTORE_TYPES = ['rdbms', 'dynamodb', 'memory'].freeze
+
     attr_accessor(*MAPPING.keys)
+
+    def validate!
+      validate_service_name
+      validate_product_id
+      validate_kms
+      validate_metastore
+      validate_kms_attributes
+    end
 
     def to_json(*args)
       config = {}.tap do |c|
@@ -54,6 +65,37 @@ module Asherah
       end
 
       JSON.generate(config, *args)
+    end
+
+    private
+
+    def validate_service_name
+      raise Error::ConfigError, 'config.service_name not set' if service_name.nil?
+    end
+
+    def validate_product_id
+      raise Error::ConfigError, 'config.product_id not set' if product_id.nil?
+    end
+
+    def validate_kms
+      raise Error::ConfigError, 'config.kms not set' if kms.nil?
+      unless KMS_TYPES.include?(kms)
+        raise Error::ConfigError, "config.kms must be one of these: #{KMS_TYPES.join(', ')}"
+      end
+    end
+
+    def validate_metastore
+      raise Error::ConfigError, 'config.metastore not set' if metastore.nil?
+      unless METASTORE_TYPES.include?(metastore)
+        raise Error::ConfigError, "config.metastore must be one of these: #{METASTORE_TYPES.join(', ')}"
+      end
+    end
+
+    def validate_kms_attributes
+      if kms == 'kms'
+        raise Error::ConfigError, 'config.region_map not set' if region_map.nil?
+        raise Error::ConfigError, 'config.preferred_region not set' if preferred_region.nil?
+      end
     end
   end
 end
