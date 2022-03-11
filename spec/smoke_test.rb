@@ -1,11 +1,21 @@
 # frozen_string_literal: true
 
+def report_error(message)
+  abort("\e[31m#{message}\e[0m")
+end
+
 require 'asherah'
-require 'rspec'
 
-load 'spec/asherah_spec.rb'
+Asherah.configure do |config|
+  config.service_name = 'gem'
+  config.product_id = 'sable'
+  config.kms = 'static'
+  config.metastore = 'memory'
+end
 
-RSpec::Core::Runner.invoke
+partition_id = 'user_1'
+data = 'test'
+data_row_record = Asherah.encrypt(partition_id, data)
+decrypted_data = Asherah.decrypt(partition_id, data_row_record)
 
-# NOTE: The following runs the specs against the source which is not what we want.
-# RSpec::Core::Runner.run(['spec/asherah_spec.rb'])
+report_error('Smoke test failed') if decrypted_data != data
