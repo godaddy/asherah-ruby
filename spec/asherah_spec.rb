@@ -31,6 +31,13 @@ RSpec.describe Asherah do
     expect(Asherah.decrypt(partition_id, data_row_record)).to eq(data)
   end
 
+  it 'encrypts to json and decrypts from json' do
+    data = 'test'
+    json = Asherah.encrypt_to_json(partition_id, data)
+    expect(JSON.parse(json).keys.sort).to eq(['Data', 'Key'])
+    expect(Asherah.decrypt_from_json(partition_id, json)).to eq(data)
+  end
+
   it 'raises error when already configured' do
     expect {
       Asherah.configure do |config|

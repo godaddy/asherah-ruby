@@ -17,6 +17,8 @@ module Asherah
     [:SetupJson, [:pointer], :int32],
     [:Encrypt, [:pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :int32],
     [:Decrypt, [:pointer, :pointer, :pointer, :int64, :pointer, :int64, :pointer], :int32],
+    [:EncryptToJson, [:pointer, :pointer, :pointer], :int32],
+    [:DecryptFromJson, [:pointer, :pointer, :pointer], :int32],
     [:Shutdown, [], :void]
   ].freeze)
 
@@ -27,18 +29,16 @@ module Asherah
     # @return [void]
     def configure
       config = Config.new
-
       yield config
-
       config.validate!
 
       config_buffer = string_to_cbuffer(config.to_json)
-      result = SetupJson(config_buffer)
 
+      result = SetupJson(config_buffer)
       Error.check_result!(result, 'SetupJson failed')
     end
 
-    # Encrypts data for a given partition_id
+    # Encrypts data for a given partition_id and returns DataRowRecord
     #
     # @param partition_id [String]
     # @param data [String]
@@ -61,7 +61,6 @@ module Asherah
         output_parent_key_id_buffer,
         output_parent_key_created_buffer
       )
-
       Error.check_result!(result, 'Encrypt failed')
 
       parent_key_meta = KeyMeta.new(
@@ -80,11 +79,11 @@ module Asherah
       )
     end
 
-    # Decrypts a data_row_record for a partition_id
+    # Decrypts a data_row_record for a partition_id and returns decrypted data
     #
     # @param partition_id [String]
     # @param data_row_record [DataRowRecord]
-    # @return [String]
+    # @return [String], Decrypted data
     def decrypt(partition_id, data_row_record)
       partition_id_buffer = string_to_cbuffer(partition_id)
       encrypted_data_buffer = string_to_cbuffer(data_row_record.data)
@@ -104,7 +103,6 @@ module Asherah
         parent_key_created,
         output_data_buffer
       )
-
       Error.check_result!(result, 'Decrypt failed')
 
       cbuffer_to_string(output_data_buffer)
@@ -112,6 +110,38 @@ module Asherah
 
     def shutdown
       Shutdown()
+    end
+
+    # Encrypts data for a given partition_id and returns DataRowRecord in JSON format
+    #
+    # @param partition_id [String]
+    # @param data [String]
+    # @return [String], DataRowRecord in JSON format
+    def encrypt_to_json(partition_id, data)
+      partition_id_buffer = string_to_cbuffer(partition_id)
+      data_buffer = string_to_cbuffer(data)
+      output_buffer = allocate_cbuffer(data.length + 256)
+
+      result = EncryptToJson(partition_id_buffer, data_buffer, output_buffer)
+      Error.check_result!(result, 'EncryptToJson failed')
+
+      cbuffer_to_string(output_buffer)
+    end
+
+    # Decrypts a DataRowRecord in JSON format for a partition_id and returns decrypted data
+    #
+    # @param partition_id [String]
+    # @param json [String], DataRowRecord in JSON format
+    # @return [String], Decrypted data
+    def decrypt_from_json(partition_id, json)
+      partition_id_buffer = string_to_cbuffer(partition_id)
+      data_buffer = string_to_cbuffer(json)
+      output_buffer = allocate_cbuffer(json.length + 256)
+
+      result = DecryptFromJson(partition_id_buffer, data_buffer, output_buffer)
+      Error.check_result!(result, 'DecryptFromJson failed')
+
+      cbuffer_to_string(output_buffer)
     end
   end
 end

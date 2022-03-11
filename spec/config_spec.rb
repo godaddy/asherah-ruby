@@ -55,7 +55,7 @@ RSpec.describe Asherah::Config do
           config.kms = 'other'
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
-        expect(e.message).to eq('config.kms must be one of these: static, kms')
+        expect(e.message).to eq('config.kms must be one of these: static, aws')
       end
     end
   end
@@ -89,7 +89,7 @@ RSpec.describe Asherah::Config do
       expect {
         Asherah.configure do |config|
           base_config.call(config)
-          config.kms = 'kms'
+          config.kms = 'aws'
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
         expect(e.message).to eq('config.region_map not set')
@@ -100,7 +100,7 @@ RSpec.describe Asherah::Config do
       expect {
         Asherah.configure do |config|
           base_config.call(config)
-          config.kms = 'kms'
+          config.kms = 'aws'
           config.region_map = 'us-west-2=arn'
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
@@ -112,7 +112,7 @@ RSpec.describe Asherah::Config do
       expect {
         Asherah.configure do |config|
           base_config.call(config)
-          config.kms = 'kms'
+          config.kms = 'aws'
           config.region_map = { 'us-west-2' => 'arn' }
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|

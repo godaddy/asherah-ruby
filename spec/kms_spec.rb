@@ -13,7 +13,7 @@ RSpec.describe 'Asherah KMS integration' do
     Asherah.configure do |config|
       config.service_name = 'gem'
       config.product_id = 'sable'
-      config.kms = 'kms'
+      config.kms = 'aws'
       config.preferred_region = 'us-west-2'
       config.region_map = { 'us-west-2' => kms_key_arn }
       config.metastore = 'memory'
