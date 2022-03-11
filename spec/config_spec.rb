@@ -96,12 +96,24 @@ RSpec.describe Asherah::Config do
       end
     end
 
-    it 'raises an error when preferred_region not set' do
+    it 'raises an error when preferred_region is not a hash' do
       expect {
         Asherah.configure do |config|
           base_config.call(config)
           config.kms = 'kms'
           config.region_map = 'us-west-2=arn'
+        end
+      }.to raise_error(Asherah::Error::ConfigError) do |e|
+        expect(e.message).to eq('config.region_map must be a Hash')
+      end
+    end
+
+    it 'raises an error when preferred_region not set' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.kms = 'kms'
+          config.region_map = { 'us-west-2' => 'arn' }
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
         expect(e.message).to eq('config.preferred_region not set')
