@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'cobhan', '~> 0.1.2'
+  spec.add_development_dependency 'dotenv', '~> 2.7.6'
 end

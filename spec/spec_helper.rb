@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'dotenv'
+Dotenv.overload('.env', '.env.secrets')
+
 require 'asherah'
 
 RSpec.configure do |config|
