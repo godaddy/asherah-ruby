@@ -8,7 +8,7 @@ module Asherah
   # @attr [String] service_name, The name of this service
   # @attr [String] product_id, The name of the product that owns this service
   # @attr [String] connection_string, The database connection string (required when metastore is rdbms)
-  # @attr [String] replica_read_consistency, Required for Aurora sessions using write forwarding (eventual, global, session)
+  # @attr [String] replica_read_consistency, For Aurora sessions using write forwarding (eventual, global, session)
   # @attr [String] dynamo_db_endpoint, An optional endpoint URL (for dynamodb metastore)
   # @attr [String] dynamo_db_region, The AWS region for DynamoDB requests (for dynamodb metastore)
   # @attr [String] dynamo_db_table_name, The table name for DynamoDB (for dynamodb metastore)
@@ -22,52 +22,38 @@ module Asherah
   # @attr [Boolean] enable_session_caching, Enable shared session caching
   # @attr [Boolean] verbose, Enable verbose logging output
   class Config
-    attr_accessor  \
-      :kms,
-      :metastore,
-      :service_name,
-      :product_id,
-      :connection_string,
-      :replica_read_consistency,
-      :dynamo_db_endpoint,
-      :dynamo_db_region,
-      :dynamo_db_table_name,
-      :enable_region_suffix,
-      :region_map,
-      :preferred_region,
-      :session_cache_max_size,
-      :session_cache_duration,
-      :enable_session_caching,
-      :expire_after,
-      :check_interval,
-      :verbose
+    MAPPING = {
+      kms: :KMS,
+      metastore: :Metastore,
+      service_name: :ServiceName,
+      product_id: :ProductID,
+      connection_string: :ConnectionString,
+      replica_read_consistency: :ReplicaReadConsistency,
+      dynamo_db_endpoint: :DynamoDBEndpoint,
+      dynamo_db_region: :DynamoDBRegion,
+      dynamo_db_table_name: :DynamoDBTableName,
+      enable_region_suffix: :EnableRegionSuffix,
+      region_map: :RegionMap,
+      preferred_region: :PreferredRegion,
+      session_cache_max_size: :SessionCacheMaxSize,
+      session_cache_duration: :SessionCacheDuration,
+      enable_session_caching: :EnableSessionCaching,
+      expire_after: :ExpireAfter,
+      check_interval: :CheckInterval,
+      verbose: :Verbose
+    }.freeze
 
-    # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    attr_accessor(*MAPPING.keys)
+
     def to_json(*args)
-      config = {
-        KMS: kms,
-        Metastore: metastore,
-        ServiceName: service_name,
-        ProductID: product_id
-      }.tap do |c|
-        c[:ConnectionString] = connection_string unless connection_string.nil?
-        c[:ReplicaReadConsistency] = replica_read_consistency unless replica_read_consistency.nil?
-        c[:DynamoDBEndpoint] = dynamo_db_endpoint unless dynamo_db_endpoint.nil?
-        c[:DynamoDBRegion] = dynamo_db_region unless dynamo_db_region.nil?
-        c[:DynamoDBTableName] = dynamo_db_table_name unless dynamo_db_table_name.nil?
-        c[:EnableRegionSuffix] = enable_region_suffix unless enable_region_suffix.nil?
-        c[:RegionMap] = region_map unless region_map.nil?
-        c[:PreferredRegion] = preferred_region unless preferred_region.nil?
-        c[:EnableSessionCaching] = enable_session_caching unless enable_session_caching.nil?
-        c[:SessionCacheMaxSize] = session_cache_max_size unless session_cache_max_size.nil?
-        c[:SessionCacheDuration] = session_cache_duration unless session_cache_duration.nil?
-        c[:ExpireAfter] = expire_after unless expire_after.nil?
-        c[:CheckInterval] = check_interval unless check_interval.nil?
-        c[:Verbose] = verbose unless verbose.nil?
+      config = {}.tap do |c|
+        MAPPING.each_pair do |our_key, their_key|
+          value = public_send(our_key)
+          c[their_key] = value unless value.nil?
+        end
       end
 
       JSON.generate(config, *args)
     end
-    # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   end
 end
