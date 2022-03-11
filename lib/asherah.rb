@@ -16,7 +16,8 @@ module Asherah
   load_library(LIB_ROOT_PATH, 'libasherah', [
     [:SetupJson, [:pointer], :int32],
     [:Encrypt, [:pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :int32],
-    [:Decrypt, [:pointer, :pointer, :pointer, :int64, :pointer, :int64, :pointer], :int32]
+    [:Decrypt, [:pointer, :pointer, :pointer, :int64, :pointer, :int64, :pointer], :int32],
+    [:Shutdown, [], :void]
   ].freeze)
 
   class << self
@@ -25,6 +26,8 @@ module Asherah
     # @yield [Config]
     # @return [void]
     def configure
+      config = Config.new
+
       yield config
 
       config.validate!
@@ -107,10 +110,8 @@ module Asherah
       cbuffer_to_string(output_data_buffer)
     end
 
-    private
-
-    def config
-      @config ||= Config.new
+    def shutdown
+      Shutdown()
     end
   end
 end
