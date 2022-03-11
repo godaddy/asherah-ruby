@@ -29,14 +29,12 @@ module Asherah
     # @return [void]
     def configure
       config = Config.new
-
       yield config
-
       config.validate!
 
       config_buffer = string_to_cbuffer(config.to_json)
-      result = SetupJson(config_buffer)
 
+      result = SetupJson(config_buffer)
       Error.check_result!(result, 'SetupJson failed')
     end
 
@@ -63,7 +61,6 @@ module Asherah
         output_parent_key_id_buffer,
         output_parent_key_created_buffer
       )
-
       Error.check_result!(result, 'Encrypt failed')
 
       parent_key_meta = KeyMeta.new(
@@ -106,7 +103,6 @@ module Asherah
         parent_key_created,
         output_data_buffer
       )
-
       Error.check_result!(result, 'Decrypt failed')
 
       cbuffer_to_string(output_data_buffer)
@@ -127,7 +123,6 @@ module Asherah
       output_buffer = allocate_cbuffer(data.length + 256)
 
       result = EncryptToJson(partition_id_buffer, data_buffer, output_buffer)
-
       Error.check_result!(result, 'EncryptToJson failed')
 
       cbuffer_to_string(output_buffer)
@@ -141,11 +136,9 @@ module Asherah
     def decrypt_from_json(partition_id, json)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
-
       output_buffer = allocate_cbuffer(json.length + 256)
 
       result = DecryptFromJson(partition_id_buffer, data_buffer, output_buffer)
-
       Error.check_result!(result, 'DecryptFromJson failed')
 
       cbuffer_to_string(output_buffer)
