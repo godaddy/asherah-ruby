@@ -39,7 +39,6 @@ jobs:
 
       - name: Run smoke tests
         run: |
-          gem install rspec -v 3.11.0
           # Don't run with `bundle exec` in order to load the installed gem.
           ruby spec/smoke_test.rb
 
@@ -76,4 +75,4 @@ jobs:
             --platform linux/arm64/v8 \
             --workdir /asherah \
             ruby:${{matrix.ruby}}-bullseye \
-            /bin/sh -c "gem install pkg/*-${{ matrix.platform }}.gem; gem install rspec -v 3.11.0; ruby spec/smoke_test.rb"
+            /bin/sh -c "gem install pkg/*-${{ matrix.platform }}.gem; ruby spec/smoke_test.rb"

@@ -2,15 +2,23 @@
 
 RSpec.describe Asherah do
   let(:partition_id) { 'user_1' }
-
-  before :all do
-    Asherah.configure do |config|
-      config.kms_type = 'static'
-      config.metastore = 'memory'
+  let(:base_config) {
+    lambda do |config|
       config.service_name = 'gem'
       config.product_id = 'sable'
-      # config.debug_output = true
+      config.kms = 'static'
+      config.metastore = 'memory'
     end
+  }
+
+  before :each do
+    Asherah.configure do |config|
+      base_config.call(config)
+    end
+  end
+
+  after :each do
+    Asherah.shutdown
   end
 
   it 'has a version number' do
@@ -26,7 +34,7 @@ RSpec.describe Asherah do
   it 'raises error when already configured' do
     expect {
       Asherah.configure do |config|
-        config.kms_type = 'static'
+        base_config.call(config)
       end
     }.to raise_error(Asherah::Error::AlreadyInitialized) do |e|
       expect(e.message).to eq('SetupJson failed')

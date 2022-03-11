@@ -12,3 +12,5 @@
 
 Gemfile.lock
 lib/asherah/native/
+
+.env.secrets
