@@ -8,6 +8,7 @@ module Asherah
   # @attr [String] service_name, The name of this service
   # @attr [String] product_id, The name of the product that owns this service
   # @attr [String] connection_string, The database connection string (required when metastore is rdbms)
+  # @attr [String] replica_read_consistency, Required for Aurora sessions using write forwarding (eventual, global, session)
   # @attr [String] dynamo_db_endpoint, An optional endpoint URL (for dynamodb metastore)
   # @attr [String] dynamo_db_region, The AWS region for DynamoDB requests (for dynamodb metastore)
   # @attr [String] dynamo_db_table_name, The table name for DynamoDB (for dynamodb metastore)
@@ -27,6 +28,7 @@ module Asherah
       :service_name,
       :product_id,
       :connection_string,
+      :replica_read_consistency,
       :dynamo_db_endpoint,
       :dynamo_db_region,
       :dynamo_db_table_name,
@@ -49,6 +51,7 @@ module Asherah
         ProductID: product_id
       }.tap do |c|
         c[:ConnectionString] = connection_string unless connection_string.nil?
+        c[:ReplicaReadConsistency] = replica_read_consistency unless replica_read_consistency.nil?
         c[:DynamoDBEndpoint] = dynamo_db_endpoint unless dynamo_db_endpoint.nil?
         c[:DynamoDBRegion] = dynamo_db_region unless dynamo_db_region.nil?
         c[:DynamoDBTableName] = dynamo_db_table_name unless dynamo_db_table_name.nil?
