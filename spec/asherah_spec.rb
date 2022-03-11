@@ -5,11 +5,11 @@ RSpec.describe Asherah do
 
   before :all do
     Asherah.configure do |config|
-      config.kms_type = 'static'
+      config.kms = 'static'
       config.metastore = 'memory'
       config.service_name = 'gem'
       config.product_id = 'sable'
-      # config.debug_output = true
+      # config.verbose = true
     end
   end
 
@@ -26,7 +26,7 @@ RSpec.describe Asherah do
   it 'raises error when already configured' do
     expect {
       Asherah.configure do |config|
-        config.kms_type = 'static'
+        config.kms = 'static'
       end
     }.to raise_error(Asherah::Error::AlreadyInitialized) do |e|
       expect(e.message).to eq('SetupJson failed')
