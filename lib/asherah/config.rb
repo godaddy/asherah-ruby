@@ -5,7 +5,7 @@ require 'json'
 module Asherah
   # @attr [String] service_name, The name of this service
   # @attr [String] product_id, The name of the product that owns this service
-  # @attr [String] kms, The master key management service (static or kms)
+  # @attr [String] kms, The master key management service (static or aws)
   # @attr [String] metastore, The type of metastore for persisting keys (rdbms, dynamodb, memory)
   # @attr [String] connection_string, The database connection string (required when metastore is rdbms)
   # @attr [String] replica_read_consistency, For Aurora sessions using write forwarding (eventual, global, session)
@@ -43,7 +43,7 @@ module Asherah
       verbose: :Verbose
     }.freeze
 
-    KMS_TYPES = ['static', 'kms'].freeze
+    KMS_TYPES = ['static', 'aws'].freeze
     METASTORE_TYPES = ['rdbms', 'dynamodb', 'memory'].freeze
 
     attr_accessor(*MAPPING.keys)
@@ -92,7 +92,7 @@ module Asherah
     end
 
     def validate_kms_attributes
-      if kms == 'kms'
+      if kms == 'aws'
         raise Error::ConfigError, 'config.region_map not set' if region_map.nil?
         raise Error::ConfigError, 'config.region_map must be a Hash' unless region_map.is_a?(Hash)
         raise Error::ConfigError, 'config.preferred_region not set' if preferred_region.nil?
