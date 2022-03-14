@@ -94,3 +94,7 @@ namespace :native do
     end
   end
 end
+
+task :version do
+  puts Asherah::VERSION
+end
