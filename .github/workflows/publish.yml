@@ -28,4 +28,4 @@ jobs:
 
       - name: Push gems
         run: |
-          gem push pkg/*.gem
+          for file in pkg/*.gem; do gem push $file; done
