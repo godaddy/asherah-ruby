@@ -67,6 +67,17 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/godaddy/asherah-ruby.
 
+## Releasing new gem version
+
+```
+# Create and push a version tag
+git tag -a v$(rake version) -m "Version $(rake version)"
+git push origin v$(rake version)
+
+# Create a release in Github to trigger .github/workflows/publish.yml workflow
+echo "Version $(rake version)"
+```
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](LICENSE.txt).
