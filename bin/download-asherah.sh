@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
+set -eu
+
+files=${*:-libasherah-arm64.dylib libasherah-arm64.so libasherah-x64.dylib libasherah-x64.so}
+
 root=$( cd "$(dirname "${BASH_SOURCE[0]}")/.." ; pwd -P )
-dir=$root/lib/asherah/native/
+DIR=$root/lib/asherah/native
+mkdir "$DIR" 2> /dev/null || true
 
-rm -rf $dir
+VERSION=v0.1.2
 
-wget --content-disposition --directory-prefix $dir/  \
-  https://github.com/godaddy/asherah-cobhan/releases/download/current/libasherah-arm64.dylib \
-  https://github.com/godaddy/asherah-cobhan/releases/download/current/libasherah-arm64.so \
-  https://github.com/godaddy/asherah-cobhan/releases/download/current/libasherah-x64.dylib \
-  https://github.com/godaddy/asherah-cobhan/releases/download/current/libasherah-x64.so \
-  || exit 1
+for file in $files; do
+  rm "$DIR/$file" 2> /dev/null || true
+  url=https://github.com/godaddy/asherah-cobhan/releases/download/$VERSION/$file
+  curl -s -L --fail --retry 999 --retry-max-time 0 "$url" --output "$DIR/$file"
+  sha256sum "$DIR/$file"
+done
