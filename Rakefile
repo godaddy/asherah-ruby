@@ -12,12 +12,26 @@ RuboCop::RakeTask.new
 
 task default: %i[spec rubocop]
 
+ASHERAH_BIN = 'bin/download-asherah.sh'
 DISTRIBUTIONS = {
   'x86_64-linux' => ['libasherah-x64.so'],
   'x86_64-darwin' => ['libasherah-x64.dylib'],
   'aarch64-linux' => ['libasherah-arm64.so'],
   'arm64-darwin' => ['libasherah-arm64.dylib']
 }.freeze
+
+def current_filename
+  @current_filename ||=
+    begin
+      require 'cobhan'
+      Class.new.extend(Cobhan).library_file_name('libasherah')
+    end
+end
+
+def current_platform
+  @distribution ||= DISTRIBUTIONS.detect { |_k, v| v.include?(current_filename) }
+  @distribution.first
+end
 
 def native_build(platform, native_files)
   puts "Building gem for #{platform}"
@@ -31,7 +45,7 @@ def native_build(platform, native_files)
 
   # Copy files to tmp gem dir
   gemspec = Bundler.load_gemspec('asherah.gemspec')
-  (gemspec.files + ['bin/download-asherah.sh']).each do |file|
+  (gemspec.files + [ASHERAH_BIN]).each do |file|
     dir = File.dirname(file)
     filename = File.basename(file)
     FileUtils.mkdir_p(File.join(tmp_gem_dir, dir))
@@ -48,7 +62,7 @@ def native_build(platform, native_files)
       native_file_path = File.join(native_dir, native_file)
 
       # Download native file
-      download_asherah_path = File.join(tmp_gem_dir, 'bin/download-asherah.sh')
+      download_asherah_path = File.join(tmp_gem_dir, ASHERAH_BIN)
       system("#{download_asherah_path} #{native_file}")
 
       # Add native file in gemspec
@@ -77,17 +91,25 @@ namespace :native do
     end
   end
 
-  namespace :smoke do
-    require 'cobhan'
+  namespace :current do
+    desc 'Download asherah binary for current platform'
+    task :download do
+      download_asherah_path = File.join(__dir__, ASHERAH_BIN)
+      system("#{download_asherah_path} #{current_filename}")
+    end
 
-    filename = Class.new.extend(Cobhan).library_file_name('libasherah')
-    platform, _files = DISTRIBUTIONS.detect { |_k, v| v.include?(filename) }
+    desc 'Build native gem for current platform'
+    task :build do
+      native_build(current_platform, DISTRIBUTIONS[current_platform])
+    end
 
-    desc "Smoke test native gem on #{platform} platform"
-    task "#{platform}": :"build:#{platform}" do
+    desc 'Smoke test native gem for current platform'
+    task smoke: :build do
+      platform = current_platform
       gemspec = Bundler.load_gemspec('asherah.gemspec')
       gemspec.platform = Gem::Platform.new(platform)
 
+      sh('gem uninstall asherah')
       sh("gem install pkg/#{gemspec.file_name}")
       sh('ruby spec/smoke_test.rb')
     end

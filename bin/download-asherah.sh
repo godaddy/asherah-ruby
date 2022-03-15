@@ -13,6 +13,7 @@ VERSION=v0.1.2
 for file in $files; do
   rm "$DIR/$file" 2> /dev/null || true
   url=https://github.com/godaddy/asherah-cobhan/releases/download/$VERSION/$file
+  echo "Downloading $url"
   curl -s -L --fail --retry 999 --retry-max-time 0 "$url" --output "$DIR/$file"
   shasum -a 256 "$DIR/$file"
 done
