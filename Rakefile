@@ -3,7 +3,6 @@
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubygems/package'
-require 'open-uri'
 
 RSpec::Core::RakeTask.new(:spec)
 
@@ -32,7 +31,7 @@ def native_build(platform, native_files)
 
   # Copy files to tmp gem dir
   gemspec = Bundler.load_gemspec('asherah.gemspec')
-  gemspec.files.each do |file|
+  (gemspec.files + ['bin/download-asherah.sh']).each do |file|
     dir = File.dirname(file)
     filename = File.basename(file)
     FileUtils.mkdir_p(File.join(tmp_gem_dir, dir))
@@ -49,11 +48,8 @@ def native_build(platform, native_files)
       native_file_path = File.join(native_dir, native_file)
       gemspec.files << native_file_path
 
-      File.open(native_file_path, 'wb') do |file|
-        url = "https://github.com/godaddy/asherah-cobhan/releases/download/current/#{native_file}"
-        puts "Downloading #{url}"
-        file << URI.parse(url).open.read
-      end
+      download_asherah_path = File.join(tmp_gem_dir, 'bin/download-asherah.sh')
+      system("#{download_asherah_path} #{native_file}")
     end
 
     package = Gem::Package.build gemspec
