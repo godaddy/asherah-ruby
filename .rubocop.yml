@@ -4,6 +4,7 @@ AllCops:
   SuggestExtensions: false
   Exclude:
     - 'vendor/**/*' # Github Actions
+    - 'tmp/**/*'
 
 Layout/LineLength:
   Max: 120

@@ -28,9 +28,9 @@ jobs:
           bundler: default
           bundler-cache: true
 
-      - name: Download binaries
+      - name: Download binary for current platform
         run: |
-          bin/download-asherah.sh
+          bundle exec rake native:current:download
 
       - name: Run specs
         run: |

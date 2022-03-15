@@ -19,3 +19,4 @@ data_row_record = Asherah.encrypt(partition_id, data)
 decrypted_data = Asherah.decrypt(partition_id, data_row_record)
 
 report_error('Smoke test failed') if decrypted_data != data
+puts 'OK'
