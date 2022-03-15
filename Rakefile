@@ -38,7 +38,7 @@ def native_build(platform, native_files)
     FileUtils.copy_file(file, File.join(tmp_gem_dir, dir, filename))
   end
 
-  # Set platform for native gem build and remove extentions
+  # Set platform for native gem build
   gemspec.platform = Gem::Platform.new(platform)
 
   native_dir = 'lib/asherah/native'
@@ -46,13 +46,16 @@ def native_build(platform, native_files)
     FileUtils.mkdir_p(native_dir)
     native_files.each do |native_file|
       native_file_path = File.join(native_dir, native_file)
-      gemspec.files << native_file_path
 
+      # Download native file
       download_asherah_path = File.join(tmp_gem_dir, 'bin/download-asherah.sh')
       system("#{download_asherah_path} #{native_file}")
+
+      # Add native file in gemspec
+      gemspec.files << native_file_path
     end
 
-    package = Gem::Package.build gemspec
+    package = Gem::Package.build(gemspec)
     FileUtils.mv package, File.join(pkg_dir, package)
   end
 end
