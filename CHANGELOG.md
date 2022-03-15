@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Implement versioning for Asherah-Cobhan binaries
+
 ## [0.1.0] - 2022-03-14
 
 - First official release
