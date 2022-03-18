@@ -9,20 +9,22 @@ module Asherah
     GetSessionFailed = Class.new(StandardError)
     EncryptFailed = Class.new(StandardError)
     DecryptFailed = Class.new(StandardError)
+    BadConfig = Class.new(StandardError)
 
     CODES = {
       -100 => NotInitialized,
       -101 => AlreadyInitialized,
       -102 => GetSessionFailed,
       -103 => EncryptFailed,
-      -104 => DecryptFailed
+      -104 => DecryptFailed,
+      -105 => BadConfig
     }.freeze
 
     def self.check_result!(result, message)
       return unless result.negative?
 
       error_class = Error::CODES.fetch(result, StandardError)
-      raise error_class, message
+      raise error_class, "#{message} (#{result})"
     end
   end
 end

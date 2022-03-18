@@ -32,7 +32,7 @@ RSpec.describe Asherah do
           base_config.call(config)
         end
       }.to raise_error(Asherah::Error::AlreadyInitialized) do |e|
-        expect(e.message).to eq('SetupJson failed')
+        expect(e.message).to eq('SetupJson failed (-101)')
       end
     end
   end
