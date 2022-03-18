@@ -18,9 +18,6 @@ module Asherah
     [:Shutdown, [], :void]
   ].freeze)
 
-  KEY_BUFFER_SIZE = 60
-  ESTIMATED_ENCRYPTION_OVERHEAD = 28
-
   class << self
     # Configures Asherah
     #
