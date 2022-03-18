@@ -8,7 +8,7 @@ root=$( cd "$(dirname "${BASH_SOURCE[0]}")/.." ; pwd -P )
 DIR=$root/lib/asherah/native
 mkdir "$DIR" 2> /dev/null || true
 
-VERSION=v0.1.2
+VERSION=v0.3.1
 
 for file in $files; do
   rm "$DIR/$file" 2> /dev/null || true
