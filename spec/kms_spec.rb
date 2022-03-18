@@ -21,7 +21,7 @@ RSpec.describe 'Asherah KMS integration' do
     end
 
     data = 'test'
-    data_row_record = Asherah.encrypt(partition_id, data)
-    expect(Asherah.decrypt(partition_id, data_row_record)).to eq(data)
+    json = Asherah.encrypt(partition_id, data)
+    expect(Asherah.decrypt(partition_id, json)).to eq(data)
   end
 end
