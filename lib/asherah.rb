@@ -19,8 +19,12 @@ module Asherah
     [:Decrypt, [:pointer, :pointer, :pointer, :int64, :pointer, :int64, :pointer], :int32],
     [:EncryptToJson, [:pointer, :pointer, :pointer], :int32],
     [:DecryptFromJson, [:pointer, :pointer, :pointer], :int32],
-    [:Shutdown, [], :void]
+    [:EstimateBuffer, [:int32, :int32], :int32],
+    [:Shutdown, [], :void],
   ].freeze)
+
+  KEY_BUFFER_SIZE = 60
+  ESTIMATED_ENCRYPTION_OVERHEAD = 28
 
   class << self
     # Configures Asherah
@@ -28,11 +32,18 @@ module Asherah
     # @yield [Config]
     # @return [void]
     def configure
-      config = Config.new
-      yield config
-      config.validate!
+      @config = Config.new
+      yield @config
+      @config.validate!
 
-      config_buffer = string_to_cbuffer(config.to_json)
+      # Example: _IK_user:1_gem_sable
+      # The partition_id (user:1) is dynamic and added during encrypt operation
+      @key_id_buffer_size_extra =
+        @config.service_name.bytesize + # 'gem'
+        @config.product_id.bytesize +   # 'sable'
+        6                               # '_' * 4  + 'IK' or 'SK'
+
+      config_buffer = string_to_cbuffer(@config.to_json)
 
       result = SetupJson(config_buffer)
       Error.check_result!(result, 'SetupJson failed')
@@ -46,10 +57,10 @@ module Asherah
     def encrypt(partition_id, data)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
-      output_encrypted_data_buffer = allocate_cbuffer(data.length + 256)
-      output_encrypted_key_buffer = allocate_cbuffer(256)
+      output_encrypted_data_buffer = allocate_cbuffer(data.bytesize + ESTIMATED_ENCRYPTION_OVERHEAD)
+      output_encrypted_key_buffer = allocate_cbuffer(KEY_BUFFER_SIZE)
       output_created_buffer = int_to_buffer(0)
-      output_parent_key_id_buffer = allocate_cbuffer(256)
+      output_parent_key_id_buffer = allocate_cbuffer(partition_id.bytesize + @key_id_buffer_size_extra)
       output_parent_key_created_buffer = int_to_buffer(0)
 
       result = Encrypt(
@@ -92,7 +103,7 @@ module Asherah
       parent_key_id_buffer = string_to_cbuffer(data_row_record.key.parent_key_meta.id)
       parent_key_created = data_row_record.key.parent_key_meta.created
 
-      output_data_buffer = allocate_cbuffer(encrypted_data_buffer.size + 256)
+      output_data_buffer = allocate_cbuffer(encrypted_data_buffer.size)
 
       result = Decrypt(
         partition_id_buffer,
@@ -120,7 +131,8 @@ module Asherah
     def encrypt_to_json(partition_id, data)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
-      output_buffer = allocate_cbuffer(data.length + 256)
+      estimated_length = EstimateBuffer(data.bytesize, partition_id.bytesize)
+      output_buffer = allocate_cbuffer(estimated_length)
 
       result = EncryptToJson(partition_id_buffer, data_buffer, output_buffer)
       Error.check_result!(result, 'EncryptToJson failed')
@@ -136,7 +148,7 @@ module Asherah
     def decrypt_from_json(partition_id, json)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
-      output_buffer = allocate_cbuffer(json.length + 256)
+      output_buffer = allocate_cbuffer(json.bytesize)
 
       result = DecryptFromJson(partition_id_buffer, data_buffer, output_buffer)
       Error.check_result!(result, 'DecryptFromJson failed')
