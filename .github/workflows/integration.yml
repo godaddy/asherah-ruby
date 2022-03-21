@@ -67,26 +67,33 @@ jobs:
           ASHERAH_PRODUCT_NAME: product
           ASHERAH_KMS_MODE: static
         run: |
-          mkdir tmp
-          cd tmp
-          git clone https://github.com/godaddy/asherah.git
-          cd asherah/tests/cross-language/go
+          ROOT_DIR=$(pwd)
+          ASHERAH_GO_DIR=$(pwd)/tmp/asherah
+          ASHERAH_GO_TEST_DIR=$(pwd)/tmp/asherah/tests/cross-language/go
+
+          # Clone Asherah repo
+          mkdir -p $ASHERAH_GO_DIR
+          cd $ASHERAH_GO_DIR
+          git clone https://github.com/godaddy/asherah.git .
+
+          # Install Go packages
+          cd $ASHERAH_GO_TEST_DIR
           go build ./...
           go mod tidy
           go get github.com/cucumber/godog/cmd/godog@v0.8.1
-          godog ../features/encrypt.feature
 
-      - name: Test Cross-Language
-        env:
-          TEST_DB_NAME: ${{ env.MYSQL_DATABASE }}
-          TEST_DB_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-          TEST_DB_HOSTNAME: ${{ env.MYSQL_HOSTNAME }}
-          TEST_DB_USER: ${{ env.MYSQL_USERNAME }}
-          TEST_DB_PORT: ${{ job.services.mysql.ports[3306] }}
-          ASHERAH_SERVICE_NAME: service
-          ASHERAH_PRODUCT_NAME: product
-          ASHERAH_KMS_MODE: static
-        run: |
-          bundle exec cucumber features/encrypt.feature
-          bundle exec cucumber features/decrypt.feature
-          ls -lah tmp
+          # Encrypt with Go
+          cd $ASHERAH_GO_TEST_DIR
+          godog "$ROOT_DIR/features/encrypt.feature"
+
+          # Encrypt with Ruby
+          cd $ROOT_DIR
+          bundle exec cucumber "$ROOT_DIR/features/encrypt.feature"
+
+          # Decrypt all with Ruby
+          cd $ROOT_DIR
+          bundle exec cucumber "$ROOT_DIR/features/decrypt.feature"
+
+          # Decrypt all with Go
+          cd $ASHERAH_GO_TEST_DIR
+          godog "$DIR/features/decrypt.feature"
