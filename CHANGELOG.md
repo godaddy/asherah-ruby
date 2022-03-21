@@ -1,6 +1,12 @@
 ## [Unreleased]
 
-- Implement versioning for Asherah-Cobhan binaries
+## [0.2.0] - 2022-03-21
+
+- Implement versioning for asherah-cobhan binaries
+- Upgrade to use asherah-cobhan v0.3.1
+- Add BadConfig error and expose error codes
+- Remove DRR methods and use JSON exclusively
+- Cross language testing using Asherah Go
 
 ## [0.1.0] - 2022-03-14
 
