@@ -17,6 +17,8 @@ git clone https://github.com/godaddy/asherah.git .
 # Install Go packages
 cd $ASHERAH_GO_TEST_DIR
 go build ./...
+go mod edit -replace github.com/godaddy/asherah/go/appencryption=../../../go/appencryption
+go mod tidy
 go get github.com/cucumber/godog/cmd/godog@v0.8.1
 
 # Encrypt with Go
