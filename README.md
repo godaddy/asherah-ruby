@@ -34,10 +34,10 @@ Configure Asherah:
 
 ```ruby
 Asherah.configure do |config|
-  config.kms_type = 'static'
+  config.kms = 'static'
   config.metastore = 'memory'
-  config.service_name = 'gem'
-  config.product_id = 'sable'
+  config.service_name = 'service'
+  config.product_id = 'product'
 end
 ```
 
@@ -46,15 +46,15 @@ Encrypt some data for a `partition_id`
 ```ruby
 partition_id = 'user_1'
 data = 'Some PII data'
-data_row_record = Asherah.encrypt(partition_id, data)
-p data_row_record
+data_row_record_json = Asherah.encrypt(partition_id, data)
+puts data_row_record_json
 ```
 
-Decrypt `data_row_record`
+Decrypt `data_row_record_json`
 
 ```ruby
-decrypted_data = Asherah.decrypt(partition_id, data_row_record)
-p decrypted_data
+decrypted_data = Asherah.decrypt(partition_id, data_row_record_json)
+puts decrypted_data
 ```
 
 ## Development
