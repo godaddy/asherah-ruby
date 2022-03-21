@@ -39,3 +39,135 @@ jobs:
       - name: Run rubocop
         run: |
           bundle exec rubocop
+
+
+  native:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }}
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-20.04 , platform: x86_64-linux , ruby: 3.0 }
+          - { os: macos-11 , platform: x86_64-darwin , ruby: 3.0 }
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: default
+          bundler-cache: true
+
+      - name: Build native gem
+        run: |
+          bundle exec rake native:build:${{ matrix.platform }}
+
+      - name: Install native gem
+        run: |
+          gem install pkg/*-${{ matrix.platform }}.gem
+
+      - name: Run smoke tests
+        run: |
+          # Don't run with `bundle exec` in order to load the installed gem.
+          ruby spec/smoke_test.rb
+
+
+  native_arm64:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ruby-${{ matrix.ruby }} arm32
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-20.04 , platform: aarch64-linux , ruby: 3.0 }
+          - { os: macos-11 , platform: arm64-darwin , ruby: 3.0 }
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: default
+          bundler-cache: true
+
+      - name: Build native gem
+        run: |
+          bundle exec rake native:build:${{ matrix.platform }}
+
+      - name: Install native gem and run smoke tests
+        if: matrix.platform == 'aarch64-linux' # skip smoke tests for arm64-darwin
+        shell: bash
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker run --rm --volume "$(pwd):/asherah" \
+            --platform linux/arm64/v8 \
+            --workdir /asherah \
+            ruby:${{matrix.ruby}}-bullseye \
+            /bin/sh -c "gem install pkg/*-${{ matrix.platform }}.gem; ruby spec/smoke_test.rb"
+
+
+  integration:
+    runs-on: ubuntu-latest
+    name: integration
+    env:
+      MYSQL_HOSTNAME: 127.0.0.1
+      MYSQL_DATABASE: testdb
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: password
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+          bundler: default
+          bundler-cache: true
+
+      - name: Download binary for current platform
+        run: |
+          bundle exec rake native:current:download
+
+      - name: Initialize RDBMS metastore
+        run: |
+          mysql -h ${{ env.MYSQL_HOSTNAME }} -P${{ job.services.mysql.ports[3306] }} -u ${{ env.MYSQL_USERNAME }} -p${{ env.MYSQL_PASSWORD }} -e "CREATE TABLE ${{ env.MYSQL_DATABASE }}.encryption_key (
+            id             VARCHAR(255) NOT NULL,
+            created        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            key_record     TEXT         NOT NULL,
+            PRIMARY KEY (id, created),
+            INDEX (created)
+          );"
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Test Cross-Language
+        env:
+          TEST_DB_NAME: ${{ env.MYSQL_DATABASE }}
+          TEST_DB_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+          TEST_DB_HOSTNAME: ${{ env.MYSQL_HOSTNAME }}
+          TEST_DB_USER: ${{ env.MYSQL_USERNAME }}
+          TEST_DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          ASHERAH_SERVICE_NAME: service
+          ASHERAH_PRODUCT_NAME: product
+          ASHERAH_KMS_MODE: static
+          CUCUMBER_PUBLISH_QUIET: true
+        run: bin/integration-test.sh
