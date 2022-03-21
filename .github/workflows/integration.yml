@@ -51,6 +51,31 @@ jobs:
             INDEX (created)
           );"
 
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Encrypt with Go
+        env:
+          TEST_DB_NAME: ${{ env.MYSQL_DATABASE }}
+          TEST_DB_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+          TEST_DB_HOSTNAME: ${{ env.MYSQL_HOSTNAME }}
+          TEST_DB_USER: ${{ env.MYSQL_USERNAME }}
+          TEST_DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          ASHERAH_SERVICE_NAME: service
+          ASHERAH_PRODUCT_NAME: product
+          ASHERAH_KMS_MODE: static
+        run: |
+          mkdir tmp
+          cd tmp
+          git clone https://github.com/godaddy/asherah.git
+          cd asherah/tests/cross-language/go
+          go build ./...
+          go mod tidy
+          go get github.com/cucumber/godog/cmd/godog@v0.8.1
+          godog ../features/encrypt.feature
+
       - name: Test Cross-Language
         env:
           TEST_DB_NAME: ${{ env.MYSQL_DATABASE }}
@@ -64,3 +89,4 @@ jobs:
         run: |
           bundle exec cucumber features/encrypt.feature
           bundle exec cucumber features/decrypt.feature
+          ls -lah tmp
