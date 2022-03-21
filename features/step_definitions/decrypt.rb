@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given 'I have encrypted_data from {string}' do |file_name|
   @encrypted_data = File.read(File.join(TMP_DIR, file_name))
 end

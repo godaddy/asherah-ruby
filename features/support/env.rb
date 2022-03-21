@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'asherah'
 require 'base64'
 
@@ -14,7 +16,7 @@ TMP_DIR           = '/tmp/'
 FILE_NAME         = 'ruby_encrypted'
 METASTORE         = 'rdbms'
 
-Before do |scenario|
+Before do |_scenario|
   Asherah.configure do |config|
     config.service_name = SERVICE_NAME
     config.product_id = PRODUCT_ID
@@ -26,6 +28,6 @@ Before do |scenario|
   end
 end
 
-After do |scenario|
+After do |_scenario|
   Asherah.shutdown
 end

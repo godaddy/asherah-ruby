@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given 'I have {string}' do |data|
   @data = data
 end
