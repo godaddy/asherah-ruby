@@ -12,7 +12,7 @@ env:
   MYSQL_HOSTNAME: 127.0.0.1
   MYSQL_DATABASE: testdb
   MYSQL_USERNAME: root
-  MYSQL_PASSWORD: Password123
+  MYSQL_PASSWORD: password
 
 jobs:
   integration:
@@ -56,7 +56,7 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Encrypt with Go
+      - name: Test Cross-Language
         env:
           TEST_DB_NAME: ${{ env.MYSQL_DATABASE }}
           TEST_DB_PASSWORD: ${{ env.MYSQL_PASSWORD }}
@@ -66,34 +66,5 @@ jobs:
           ASHERAH_SERVICE_NAME: service
           ASHERAH_PRODUCT_NAME: product
           ASHERAH_KMS_MODE: static
-        run: |
-          ROOT_DIR=$(pwd)
-          ASHERAH_GO_DIR=$(pwd)/tmp/asherah
-          ASHERAH_GO_TEST_DIR=$(pwd)/tmp/asherah/tests/cross-language/go
-
-          # Clone Asherah repo
-          mkdir -p $ASHERAH_GO_DIR
-          cd $ASHERAH_GO_DIR
-          git clone https://github.com/godaddy/asherah.git .
-
-          # Install Go packages
-          cd $ASHERAH_GO_TEST_DIR
-          go build ./...
-          go mod tidy
-          go get github.com/cucumber/godog/cmd/godog@v0.8.1
-
-          # Encrypt with Go
-          cd $ASHERAH_GO_TEST_DIR
-          godog "$ROOT_DIR/features/encrypt.feature"
-
-          # Encrypt with Ruby
-          cd $ROOT_DIR
-          bundle exec cucumber "$ROOT_DIR/features/encrypt.feature"
-
-          # Decrypt all with Ruby
-          cd $ROOT_DIR
-          bundle exec cucumber "$ROOT_DIR/features/decrypt.feature"
-
-          # Decrypt all with Go
-          cd $ASHERAH_GO_TEST_DIR
-          godog "$DIR/features/decrypt.feature"
+          CUCUMBER_PUBLISH_QUIET: true
+        run: bin/integration-test.sh
