@@ -1,0 +1,32 @@
+name: Integration
+
+on:
+  pull_request:
+    branches:
+      - "*"
+  push:
+    branches:
+      - main
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    name: integration
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+          bundler: default
+          bundler-cache: true
+
+      - name: Download binary for current platform
+        run: |
+          bundle exec rake native:current:download
+
+      - name: Run specs
+        run: |
+          bundle exec cucumber features/encrypt.feature
+          bundle exec cucumber features/decrypt.feature
