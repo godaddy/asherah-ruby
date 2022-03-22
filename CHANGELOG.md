@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.3.0] - 2022-03-22
+
+- Free up cobhan buffers after encrypt/decrypt to prevent growing heap memory
+- Use local `estimate_buffer` calculation instead of FFI call
+- Upgrade to use asherah-cobhan v0.4.3
+
 ## [0.2.0] - 2022-03-21
 
 - Implement versioning for asherah-cobhan binaries
