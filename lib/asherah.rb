@@ -14,9 +14,12 @@ module Asherah
     [:SetupJson, [:pointer], :int32],
     [:EncryptToJson, [:pointer, :pointer, :pointer], :int32],
     [:DecryptFromJson, [:pointer, :pointer, :pointer], :int32],
-    [:EstimateBuffer, [:int32, :int32], :int32],
     [:Shutdown, [], :void]
   ].freeze)
+
+  ESTIMATED_ENCRYPTION_OVERHEAD = 48
+  ESTIMATED_ENVELOPE_OVERHEAD = 185
+  BASE64_OVERHEAD = 1.34
 
   class << self
     # Configures Asherah
@@ -27,6 +30,7 @@ module Asherah
       config = Config.new
       yield config
       config.validate!
+      @intermediated_key_overhead_bytesize = config.product_id.bytesize + config.service_name.bytesize
 
       config_buffer = string_to_cbuffer(config.to_json)
 
@@ -52,8 +56,8 @@ module Asherah
     def encrypt(partition_id, data)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
-      estimated_length = EstimateBuffer(data.bytesize, partition_id.bytesize)
-      output_buffer = allocate_cbuffer(estimated_length)
+      estimated_buffer_bytesize = estimate_buffer(data.bytesize, partition_id.bytesize)
+      output_buffer = allocate_cbuffer(estimated_buffer_bytesize)
 
       result = EncryptToJson(partition_id_buffer, data_buffer, output_buffer)
       Error.check_result!(result, 'EncryptToJson failed')
@@ -84,6 +88,15 @@ module Asherah
     # Stop the Asherah instance
     def shutdown
       Shutdown()
+    end
+
+    private
+
+    def estimate_buffer(data_bytesize, partition_bytesize)
+      ESTIMATED_ENVELOPE_OVERHEAD +
+        @intermediated_key_overhead_bytesize +
+        partition_bytesize +
+        (data_bytesize + ESTIMATED_ENCRYPTION_OVERHEAD) * BASE64_OVERHEAD
     end
   end
 end
