@@ -1,11 +1,15 @@
 require 'net/http'
 require 'open-uri'
 require 'fileutils'
+require 'digest'
+require 'yaml'
 
 class NativeDownloader
-  ASHERAH_VERSION = 'v0.4.3'
   RETRIES = 3
   RETRY_DELAY = 1
+  CHECKSUMS_FILE = File.expand_path('checksums.yml', __dir__)
+  CHECKSUMS = YAML.load_file(CHECKSUMS_FILE)
+  ASHERAH_VERSION = CHECKSUMS.fetch('version')
 
   class << self
     def download(root_dir, file_name)
@@ -30,7 +34,13 @@ class NativeDownloader
         tries += 1
         url = "https://github.com/godaddy/asherah-cobhan/releases/download/#{ASHERAH_VERSION}/#{file_name}"
         puts "Downloading #{url}"
-        File.binwrite(file_path, URI.parse(url).open.read)
+        content = URI.parse(url).open.read
+        sha256 = Digest::SHA256.hexdigest(content)
+        if sha256 != CHECKSUMS.fetch(file_name)
+          abort "Could not verify checksum of #{file_name}"
+        end
+
+        File.binwrite(file_path, content)
       rescue Net::OpenTimeout, Net::ReadTimeout => e
         if tries <= RETRIES
           puts "Got #{e.class}... retrying in #{RETRY_DELAY} seconds"
