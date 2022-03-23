@@ -24,8 +24,8 @@ jobs:
 
       - name: Build gems
         run: |
-          bundle exec rake native:build
+          bundle exec rake build
 
       - name: Push gems
         run: |
-          for file in pkg/*.gem; do gem push $file; done
+          gem push pkg/asherah-$(bundle exec rake version).gem
