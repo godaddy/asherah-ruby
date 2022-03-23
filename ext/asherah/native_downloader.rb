@@ -9,7 +9,7 @@ class NativeDownloader
   RETRY_DELAY = 1
   CHECKSUMS_FILE = File.expand_path('checksums.yml', __dir__)
   CHECKSUMS = YAML.load_file(CHECKSUMS_FILE)
-  ASHERAH_VERSION = CHECKSUMS.fetch('version')
+  VERSION = CHECKSUMS.fetch('version')
 
   class << self
     def download(root_dir, file_name)
@@ -28,15 +28,16 @@ class NativeDownloader
     private
 
     def download_file(file_path, file_name)
+      checksum = CHECKSUMS.fetch(file_name) { abort "Unsupported platform for #{file_name}" }
       tries = 0
 
       begin
         tries += 1
-        url = "https://github.com/godaddy/asherah-cobhan/releases/download/#{ASHERAH_VERSION}/#{file_name}"
+        url = "https://github.com/godaddy/asherah-cobhan/releases/download/#{VERSION}/#{file_name}"
         puts "Downloading #{url}"
         content = URI.parse(url).open.read
         sha256 = Digest::SHA256.hexdigest(content)
-        if sha256 != CHECKSUMS.fetch(file_name)
+        if sha256 != checksum
           abort "Could not verify checksum of #{file_name}"
         end
 
