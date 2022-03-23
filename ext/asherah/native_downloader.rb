@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require 'net/http'
 require 'open-uri'
 require 'fileutils'
 require 'digest'
 require 'yaml'
 
+# Downloads native file and verifies checksums
 class NativeDownloader
   RETRIES = 3
   RETRY_DELAY = 1
@@ -36,10 +39,9 @@ class NativeDownloader
         url = "https://github.com/godaddy/asherah-cobhan/releases/download/#{VERSION}/#{file_name}"
         puts "Downloading #{url}"
         content = URI.parse(url).open.read
+
         sha256 = Digest::SHA256.hexdigest(content)
-        if sha256 != checksum
-          abort "Could not verify checksum of #{file_name}"
-        end
+        abort "Could not verify checksum of #{file_name}" if sha256 != checksum
 
         File.binwrite(file_path, content)
       rescue Net::OpenTimeout, Net::ReadTimeout => e
