@@ -5,7 +5,7 @@ require 'fileutils'
 require 'digest'
 require 'yaml'
 
-# Downloads native file and verifies checksums
+# Downloads native file and verifies checksum
 class NativeDownloader
   RETRIES = 3
   RETRY_DELAY = 1
