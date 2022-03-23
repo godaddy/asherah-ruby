@@ -30,11 +30,11 @@ jobs:
 
       - name: Download binary for current platform
         run: |
-          bundle exec rake native:current:download
+          bundle exec rake download
 
       - name: Run specs
         run: |
-          COVERAGE=true bundle exec rspec spec
+          COVERAGE=true bundle exec rake spec
 
       - name: Run rubocop
         run: |
@@ -140,7 +140,7 @@ jobs:
 
       - name: Download binary for current platform
         run: |
-          bundle exec rake native:current:download
+          bundle exec rake download
 
       - name: Initialize RDBMS metastore
         run: |

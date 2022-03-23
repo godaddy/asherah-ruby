@@ -7,11 +7,11 @@ require 'yaml'
 
 # Downloads native file and verifies checksum
 class NativeDownloader
-  RETRIES = 3
-  RETRY_DELAY = 1
   CHECKSUMS_FILE = File.expand_path('checksums.yml', __dir__)
   CHECKSUMS = YAML.load_file(CHECKSUMS_FILE)
   VERSION = CHECKSUMS.fetch('version')
+  RETRIES = 3
+  RETRY_DELAY = 1
 
   class << self
     def download(root_dir, file_name)
