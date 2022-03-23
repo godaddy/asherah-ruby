@@ -3,6 +3,7 @@
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubygems/package'
+require_relative './ext/asherah/native_downloader'
 
 RSpec::Core::RakeTask.new(:spec)
 
@@ -12,7 +13,6 @@ RuboCop::RakeTask.new
 
 task default: %i[spec rubocop]
 
-ASHERAH_BIN = 'bin/download-asherah.sh'
 DISTRIBUTIONS = {
   'x86_64-linux' => ['libasherah-x64.so'],
   'x86_64-darwin' => ['libasherah-x64.dylib'],
@@ -33,37 +33,36 @@ def current_platform
   @distribution.first
 end
 
-def native_build(platform, native_files)
+def native_build(platform, file_names)
   puts "Building gem for #{platform}"
 
   pkg_dir = File.join(__dir__, 'pkg')
   FileUtils.mkdir_p(pkg_dir)
 
-  tmp_gem_dir = File.join(__dir__, 'tmp', platform)
-  FileUtils.rm_rf(tmp_gem_dir, verbose: true)
-  FileUtils.mkdir_p(tmp_gem_dir, verbose: true)
+  gem_root_dir = File.join(__dir__, 'tmp', platform)
+  FileUtils.rm_rf(gem_root_dir, verbose: true)
+  FileUtils.mkdir_p(gem_root_dir, verbose: true)
 
   # Copy files to tmp gem dir
   gemspec = Bundler.load_gemspec('asherah.gemspec')
-  (gemspec.files + [ASHERAH_BIN]).each do |file|
+  gemspec.files.each do |file|
     dir = File.dirname(file)
     filename = File.basename(file)
-    FileUtils.mkdir_p(File.join(tmp_gem_dir, dir))
-    FileUtils.copy_file(file, File.join(tmp_gem_dir, dir, filename))
+    FileUtils.mkdir_p(File.join(gem_root_dir, dir))
+    FileUtils.copy_file(file, File.join(gem_root_dir, dir, filename))
   end
 
   # Set platform for native gem build
   gemspec.platform = Gem::Platform.new(platform)
 
   native_dir = 'lib/asherah/native'
-  FileUtils.cd(tmp_gem_dir, verbose: true) do
+  FileUtils.cd(gem_root_dir, verbose: true) do
     FileUtils.mkdir_p(native_dir)
-    native_files.each do |native_file|
-      native_file_path = File.join(native_dir, native_file)
+    file_names.each do |file_name|
+      native_file_path = File.join(native_dir, file_name)
 
       # Download native file
-      download_asherah_path = File.join(tmp_gem_dir, ASHERAH_BIN)
-      system("#{download_asherah_path} #{native_file}")
+      NativeDownloader.download(gem_root_dir, file_name)
 
       # Add native file in gemspec
       gemspec.files << native_file_path
@@ -77,16 +76,16 @@ end
 namespace :native do
   desc 'Build all native gems'
   task :build do
-    DISTRIBUTIONS.each do |platform, native_files|
-      native_build(platform, native_files)
+    DISTRIBUTIONS.each do |platform, file_names|
+      native_build(platform, file_names)
     end
   end
 
   namespace :build do
-    DISTRIBUTIONS.each do |platform, native_files|
+    DISTRIBUTIONS.each do |platform, file_names|
       desc "Build native gem for #{platform}"
       task :"#{platform}" do
-        native_build(platform, native_files)
+        native_build(platform, file_names)
       end
     end
   end
@@ -94,8 +93,8 @@ namespace :native do
   namespace :current do
     desc 'Download asherah binary for current platform'
     task :download do
-      download_asherah_path = File.join(__dir__, ASHERAH_BIN)
-      system("#{download_asherah_path} #{current_filename}")
+      root_dir = File.expand_path('.', __dir__)
+      NativeDownloader.download(root_dir, current_filename)
     end
 
     desc 'Build native gem for current platform'
