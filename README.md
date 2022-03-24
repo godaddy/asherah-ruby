@@ -12,7 +12,7 @@ Check out the following documentation to get more familiar with the concepts and
 
 ## Supported Platforms
 
-Currently supported platforms are Linux and Darwin operating systems for x64 and arm64 APU architectures.
+Currently supported platforms are Linux and Darwin operating systems for x64 and arm64 CPU architectures.
 
 ## Installation
 

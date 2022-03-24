@@ -28,10 +28,6 @@ jobs:
           bundler: default
           bundler-cache: true
 
-      - name: Download binary for current platform
-        run: |
-          bundle exec rake download
-
       - name: Run specs
         run: |
           COVERAGE=true bundle exec rake spec
