@@ -11,7 +11,9 @@ RuboCop::RakeTask.new
 
 desc 'Download the binary for the current platform'
 task :download do
-  FileUtils.cd('tmp', verbose: true) do
+  tmp_dir = 'tmp'
+  FileUtils.mkdir_p(tmp_dir)
+  FileUtils.cd(tmp_dir, verbose: true) do
     system('ruby ../ext/asherah/extconf.rb')
   end
 end
