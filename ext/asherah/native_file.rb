@@ -29,7 +29,7 @@ class NativeFile
       abort "#{file_path} already exists" if File.exist?(file_path)
 
       checksum = CHECKSUMS.fetch(file_name) do
-        abort "Unsupported platform - OS: #{FFI::Platform::OS}, ARCH: #{FFI::Platform::ARCH}"
+        abort "Unsupported platform #{RUBY_PLATFORM}"
       end
 
       content = download_content(file_name)
