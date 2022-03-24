@@ -1,6 +1,6 @@
 # Asherah
 
-Asherah is a Ruby wrapper around [Asherah Go](https://github.com/godaddy/asherah) application-layer encryption SDK that provides advanced encryption features and defense in depth against compromise. It uses a technique known as "envelope encryption" and supports cloud-agnostic data storage and key management.
+Asherah is a Ruby FFI wrapper around Go version of [Asherah](https://github.com/godaddy/asherah) application-layer encryption SDK. Asherah provides advanced encryption features and defense in depth against compromise. It uses a technique known as "envelope encryption" and supports cloud-agnostic data storage and key management.
 
 Check out the following documentation to get more familiar with its concepts:
 
@@ -9,6 +9,10 @@ Check out the following documentation to get more familiar with its concepts:
 - [Key Management Service](https://github.com/godaddy/asherah/blob/master/docs/KeyManagementService.md)
 - [Metastore](https://github.com/godaddy/asherah/blob/master/docs/Metastore.md)
 - [System Requirements](https://github.com/godaddy/asherah/blob/master/docs/SystemRequirements.md)
+
+## Supported Platforms
+
+Currently supported platforms are Linux and Darwin operating systems for x64 and arm64 APU architectures.
 
 ## Installation
 
@@ -45,7 +49,7 @@ Encrypt some data for a `partition_id`
 
 ```ruby
 partition_id = 'user_1'
-data = 'Some PII data'
+data = 'PII data'
 data_row_record_json = Asherah.encrypt(partition_id, data)
 puts data_row_record_json
 ```
