@@ -37,9 +37,9 @@ jobs:
           bundle exec rubocop
 
 
-  native:
+  smoke:
     runs-on: ${{ matrix.os }}
-    name: native ruby-${{ matrix.ruby }} ${{ matrix.os }}
+    name: smoke ruby-${{ matrix.ruby }} ${{ matrix.os }}
     strategy:
       matrix:
         include:
@@ -57,23 +57,23 @@ jobs:
           bundler: default
           bundler-cache: true
 
-      - name: Build native gem
+      - name: Smoke test gem
         run: |
           bundle exec rake build
-
-      - name: Install native gem
-        run: |
           gem install pkg/asherah-$(bundle exec rake version).gem
+          ruby spec/smoke_test.rb # Don't use `bundle exec` to load the installed gem.
+          gem uninstall asherah
 
-      - name: Run smoke tests
+      - name: Smoke test platform gem
         run: |
-          # Don't run with `bundle exec` in order to load the installed gem.
-          ruby spec/smoke_test.rb
+          bundle exec rake native:build:${{ matrix.platform }}
+          gem install pkg/asherah-$(bundle exec rake version)-${{ matrix.platform }}.gem
+          ruby spec/smoke_test.rb # Don't use `bundle exec` to load the installed gem.
+          gem uninstall asherah
 
-
-  native_arm64:
+  smoke_arm64:
     runs-on: ${{ matrix.os }}
-    name: native arm32 ruby-${{ matrix.ruby }} ${{ matrix.os }}
+    name: smoke arm32 ruby-${{ matrix.ruby }} ${{ matrix.os }}
     strategy:
       matrix:
         include:
@@ -90,20 +90,27 @@ jobs:
           bundler: default
           bundler-cache: true
 
-      - name: Build native gem
+      - name: Smoke test gems
         run: |
           bundle exec rake build
+          bundle exec rake native:build:${{ matrix.platform }}
 
-      - name: Install native gem and run smoke tests
-        shell: bash
-        run: |
+          GEM_NAME=asherah-$(bundle exec rake version).gem
+          GEM_PLATFORM_NAME=asherah-$(bundle exec rake version)-${{ matrix.platform }}.gem
+
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
           docker run --rm --volume "$(pwd):/asherah" \
             --platform linux/arm64/v8 \
             --workdir /asherah \
             ruby:${{matrix.ruby}}-bullseye \
-            /bin/sh -c "gem install pkg/asherah-$(bundle exec rake version).gem; ruby spec/smoke_test.rb"
-
+            /bin/sh -c "
+              gem install pkg/$GEM_NAME
+              ruby spec/smoke_test.rb
+              gem uninstall asherah
+              gem install pkg/$GEM_PLATFORM_NAME
+              ruby spec/smoke_test.rb
+              gem uninstall asherah
+            "
 
   cross_language_tests:
     runs-on: ubuntu-latest

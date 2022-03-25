@@ -25,3 +25,5 @@ desc 'Print current version'
 task :version do
   puts Asherah::VERSION
 end
+
+Rake.add_rakelib 'tasks'

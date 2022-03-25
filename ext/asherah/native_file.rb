@@ -17,16 +17,15 @@ class NativeFile
   RETRY_DELAY = 1
 
   class << self
-    def download
-      file_name = Class.new.extend(Cobhan).library_file_name(LIB_NAME)
-      lib_dir = File.join(ROOT_DIR, 'lib/asherah')
-      abort "#{lib_dir} does not exist" unless File.exist?(lib_dir)
-
-      native_dir = "#{lib_dir}/native"
-      FileUtils.mkdir_p(native_dir)
-
-      file_path = File.join(native_dir, file_name)
-      abort "#{file_path} already exists" if File.exist?(file_path)
+    def download(
+      file_name: Class.new.extend(Cobhan).library_file_name(LIB_NAME),
+      dir: File.join(ROOT_DIR, 'lib/asherah/native')
+    )
+      file_path = File.join(dir, file_name)
+      if File.exist?(file_path)
+        puts "#{file_path} already exists ... skipping download"
+        return
+      end
 
       checksum = CHECKSUMS.fetch(file_name) do
         abort "Unsupported platform #{RUBY_PLATFORM}"
@@ -37,6 +36,7 @@ class NativeFile
       sha256 = Digest::SHA256.hexdigest(content)
       abort "Could not verify checksum of #{file_name}" if sha256 != checksum
 
+      FileUtils.mkdir_p(dir)
       File.binwrite(file_path, content)
     end
 
