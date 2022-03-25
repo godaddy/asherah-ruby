@@ -90,28 +90,27 @@ jobs:
           bundler: default
           bundler-cache: true
 
-      - name: Smoke test gem
+      - name: Smoke test gems
         run: |
           bundle exec rake build
-          GEM_NAME=asherah-$(bundle exec rake version).gem
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker run --rm --volume "$(pwd):/asherah" \
-            --platform linux/arm64/v8 \
-            --workdir /asherah \
-            ruby:${{matrix.ruby}}-bullseye \
-            /bin/sh -c "gem install pkg/$GEM_NAME; ruby spec/smoke_test.rb"
-
-      - name: Smoke test platform gem
-        run: |
           bundle exec rake native:build:${{ matrix.platform }}
-          GEM_NAME=asherah-$(bundle exec rake version)-${{ matrix.platform }}.gem
+
+          GEM_NAME=asherah-$(bundle exec rake version).gem
+          GEM_PLATFORM_NAME=asherah-$(bundle exec rake version)-${{ matrix.platform }}.gem
+
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
           docker run --rm --volume "$(pwd):/asherah" \
             --platform linux/arm64/v8 \
             --workdir /asherah \
             ruby:${{matrix.ruby}}-bullseye \
-            /bin/sh -c "gem install pkg/$GEM_NAME; ruby spec/smoke_test.rb"
-
+            /bin/sh -c "
+              gem install pkg/$GEM_NAME
+              ruby spec/smoke_test.rb
+              gem uninstall asherah
+              gem install pkg/$GEM_PLATFORM_NAME
+              ruby spec/smoke_test.rb
+              gem uninstall asherah
+            "
 
   cross_language_tests:
     runs-on: ubuntu-latest
