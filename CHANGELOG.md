@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.4.0] - 2022-03-23
+
+- Download native file during gem install and verify checksum
+- Upgrade to use asherah-cobhan v0.4.11
+
 ## [0.3.0] - 2022-03-22
 
 - Free up cobhan buffers after encrypt/decrypt to prevent growing heap memory

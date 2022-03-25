@@ -28,13 +28,9 @@ jobs:
           bundler: default
           bundler-cache: true
 
-      - name: Download binary for current platform
-        run: |
-          bundle exec rake native:current:download
-
       - name: Run specs
         run: |
-          COVERAGE=true bundle exec rspec spec
+          COVERAGE=true bundle exec rake spec
 
       - name: Run rubocop
         run: |
@@ -63,11 +59,11 @@ jobs:
 
       - name: Build native gem
         run: |
-          bundle exec rake native:build:${{ matrix.platform }}
+          bundle exec rake build
 
       - name: Install native gem
         run: |
-          gem install pkg/*-${{ matrix.platform }}.gem
+          gem install pkg/asherah-$(bundle exec rake version).gem
 
       - name: Run smoke tests
         run: |
@@ -82,7 +78,6 @@ jobs:
       matrix:
         include:
           - { os: ubuntu-20.04 , platform: aarch64-linux , ruby: 3.0 }
-          - { os: macos-11 , platform: arm64-darwin , ruby: 3.0 }
       fail-fast: false
 
     steps:
@@ -97,10 +92,9 @@ jobs:
 
       - name: Build native gem
         run: |
-          bundle exec rake native:build:${{ matrix.platform }}
+          bundle exec rake build
 
       - name: Install native gem and run smoke tests
-        if: matrix.platform == 'aarch64-linux' # skip smoke tests for arm64-darwin
         shell: bash
         run: |
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
@@ -108,7 +102,7 @@ jobs:
             --platform linux/arm64/v8 \
             --workdir /asherah \
             ruby:${{matrix.ruby}}-bullseye \
-            /bin/sh -c "gem install pkg/*-${{ matrix.platform }}.gem; ruby spec/smoke_test.rb"
+            /bin/sh -c "gem install pkg/asherah-$(bundle exec rake version).gem; ruby spec/smoke_test.rb"
 
 
   cross_language_tests:
@@ -142,7 +136,7 @@ jobs:
 
       - name: Download binary for current platform
         run: |
-          bundle exec rake native:current:download
+          bundle exec rake download
 
       - name: Initialize RDBMS metastore
         run: |
