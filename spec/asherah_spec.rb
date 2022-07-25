@@ -57,4 +57,10 @@ RSpec.describe Asherah do
       expect(e.message).to eq('SetupJson failed (-101)')
     end
   end
+
+  it 'can set environment variables' do
+    expect {
+      Asherah.set_env('VAR1' => 'VALUE1')
+    }.not_to raise_error
+  end
 end

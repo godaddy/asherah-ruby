@@ -11,6 +11,7 @@ module Asherah
 
   LIB_ROOT_PATH = File.expand_path('asherah/native', __dir__)
   load_library(LIB_ROOT_PATH, 'libasherah', [
+    [:SetEnv, [:pointer], :int32],
     [:SetupJson, [:pointer], :int32],
     [:EncryptToJson, [:pointer, :pointer, :pointer], :int32],
     [:DecryptFromJson, [:pointer, :pointer, :pointer], :int32],
@@ -22,6 +23,22 @@ module Asherah
   BASE64_OVERHEAD = 1.34
 
   class << self
+    # Set environment variables needed by Asherah dependencies for when
+    # Go os.Getenv() doesn't see variables set by C.setenv().
+    # References:
+    #   https://github.com/golang/go/wiki/cgo#environmental-variables
+    #   https://github.com/golang/go/issues/44108
+    #
+    # @yield [Config]
+    # @param env [Hash], Key-value pairs to set Asherah ENV
+    # @return [void]
+    def set_env(env = {})
+      env_buffer = string_to_cbuffer(env.to_json)
+
+      result = SetEnv(env_buffer)
+      Error.check_result!(result, 'SetEnv failed')
+    end
+
     # Configures Asherah
     #
     # @yield [Config]

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.4.2] - 2022-07-25
+
+- Upgrade to use asherah-cobhan v0.4.15
+- Add `set_env` method to set environment variables for Asherah
+
 ## [0.4.1] - 2022-03-25
 
 - Build and release platform gems

@@ -32,3 +32,6 @@ Metrics/AbcSize:
 
 Style/GuardClause:
   Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false

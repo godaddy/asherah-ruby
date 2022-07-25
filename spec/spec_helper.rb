@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if ENV['COVERAGE'] == 'true'
+if ENV.fetch('COVERAGE', nil) == 'true'
   require 'simplecov'
   require 'simplecov-console'
 
