@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.4.3] - 2022-08-31
+
+- Upgrade to use asherah-cobhan v0.4.16
+
 ## [0.4.2] - 2022-07-25
 
 - Upgrade to use asherah-cobhan v0.4.15
