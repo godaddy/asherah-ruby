@@ -19,11 +19,11 @@ cd $ASHERAH_GO_TEST_DIR
 go build ./...
 go mod edit -replace github.com/godaddy/asherah/go/appencryption=../../../go/appencryption
 go mod tidy
-go get github.com/cucumber/godog/cmd/godog@v0.8.1
+go install github.com/cucumber/godog/cmd/godog@latest
 
 # Encrypt with Go
 cd $ASHERAH_GO_TEST_DIR
-godog "$ROOT_DIR/features/encrypt.feature"
+godog run "$ROOT_DIR/features/encrypt.feature"
 
 # Encrypt with Ruby
 cd $ROOT_DIR
@@ -35,4 +35,4 @@ bundle exec cucumber "$ROOT_DIR/features/decrypt.feature"
 
 # Decrypt all with Go
 cd $ASHERAH_GO_TEST_DIR
-godog "$ROOT_DIR/features/decrypt.feature"
+godog run "$ROOT_DIR/features/decrypt.feature"
