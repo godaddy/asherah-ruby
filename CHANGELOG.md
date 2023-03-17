@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.4.6] - 2023-03-17
+
+- Upgrade to use asherah-cobhan v0.4.20
+- Change detault ruby version to 3.2
+- Add ruby 3.2 to build matrix
+- Remove ruby 2.5 and 2.6 from build matrix
+
 ## [0.4.5] - 2022-10-31
 
 - Upgrade to use asherah-cobhan v0.4.18
