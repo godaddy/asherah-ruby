@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.4.7] - 2023-04-20
+
+- Upgrade to use asherah-cobhan v0.4.22
+- Change detault ruby version to 3.2.2
+
 ## [0.4.6] - 2023-03-17
 
 - Upgrade to use asherah-cobhan v0.4.20
