@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rubygems/package'
-require_relative './../ext/asherah/native_file'
+require_relative '../ext/asherah/native_file'
 
 ROOT_DIR = File.join(__dir__, '../')
 NATIVE_DIR = 'lib/asherah/native'
