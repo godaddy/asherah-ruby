@@ -45,6 +45,8 @@ Asherah.configure do |config|
 end
 ```
 
+See [config.rb](lib/asherah/config.rb) for all evailable configuration options.
+
 Encrypt some data for a `partition_id`
 
 ```ruby

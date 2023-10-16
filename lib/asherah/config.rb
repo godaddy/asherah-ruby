@@ -43,8 +43,8 @@ module Asherah
       verbose: :Verbose
     }.freeze
 
-    KMS_TYPES = ['static', 'aws'].freeze
-    METASTORE_TYPES = ['rdbms', 'dynamodb', 'memory'].freeze
+    KMS_TYPES = ['static', 'aws', 'test-debug-static'].freeze
+    METASTORE_TYPES = ['rdbms', 'dynamodb', 'memory', 'test-debug-memory'].freeze
 
     attr_accessor(*MAPPING.keys)
 

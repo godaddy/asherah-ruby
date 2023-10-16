@@ -6,8 +6,8 @@ RSpec.describe Asherah do
     lambda do |config|
       config.service_name = 'gem'
       config.product_id = 'sable'
-      config.kms = 'static'
-      config.metastore = 'memory'
+      config.kms = 'test-debug-static'
+      config.metastore = 'test-debug-memory'
     end
   }
 
