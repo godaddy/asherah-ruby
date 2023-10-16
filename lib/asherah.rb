@@ -45,6 +45,7 @@ module Asherah
     # @return [void]
     def configure
       raise Asherah::Error::AlreadyInitialized if @initialized
+
       config = Config.new
       yield config
       config.validate!
@@ -107,6 +108,7 @@ module Asherah
     # Stop the Asherah instance
     def shutdown
       raise Asherah::Error::NotInitialized unless @initialized
+
       Shutdown()
       @initialized = false
     end
