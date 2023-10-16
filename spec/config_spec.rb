@@ -55,7 +55,7 @@ RSpec.describe Asherah::Config do
           config.kms = 'other'
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
-        expect(e.message).to eq('config.kms must be one of these: static, aws')
+        expect(e.message).to eq('config.kms must be one of these: static, aws, test-debug-static')
       end
     end
   end
@@ -79,7 +79,7 @@ RSpec.describe Asherah::Config do
           config.metastore = 'other'
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
-        expect(e.message).to eq('config.metastore must be one of these: rdbms, dynamodb, memory')
+        expect(e.message).to eq('config.metastore must be one of these: rdbms, dynamodb, memory, test-debug-memory')
       end
     end
   end

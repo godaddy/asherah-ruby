@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.5.0] - 2023-10-16
+
+- Upgrade to use asherah-cobhan v0.4.30
+- Expose `test-debug-static` kms type and `test-debug-memory` metastore type to skip warnings in tests
+- Check initialized flag on setup/shutdown and raise appropriate errors
+
 ## [0.4.10] - 2023-08-10
 
 - Upgrade to use asherah-cobhan v0.4.25

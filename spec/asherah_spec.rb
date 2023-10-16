@@ -6,8 +6,8 @@ RSpec.describe Asherah do
     lambda do |config|
       config.service_name = 'gem'
       config.product_id = 'sable'
-      config.kms = 'static'
-      config.metastore = 'memory'
+      config.kms = 'test-debug-static'
+      config.metastore = 'test-debug-memory'
     end
   }
 
@@ -48,14 +48,22 @@ RSpec.describe Asherah do
     expect(Asherah.decrypt(partition_id, json)).to eq(data)
   end
 
-  it 'raises error when already configured' do
+  it 'raises error on configure when already configured' do
     expect {
       Asherah.configure do |config|
         base_config.call(config)
       end
-    }.to raise_error(Asherah::Error::AlreadyInitialized) do |e|
-      expect(e.message).to eq('SetupJson failed (-101)')
-    end
+    }.to raise_error(Asherah::Error::AlreadyInitialized)
+  end
+
+  it 'raises error on shutdown when not initialized' do
+    Asherah.shutdown # Before each work-around
+
+    expect {
+      Asherah.shutdown
+    }.to raise_error(Asherah::Error::NotInitialized)
+
+    Asherah.configure { |config| base_config.call(config) } # After each work-around
   end
 
   it 'can set environment variables' do
