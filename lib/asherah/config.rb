@@ -9,6 +9,7 @@ module Asherah
   # @attr [String] metastore, The type of metastore for persisting keys (rdbms, dynamodb, memory)
   # @attr [String] connection_string, The database connection string (required when metastore is rdbms)
   # @attr [String] replica_read_consistency, For Aurora sessions using write forwarding (eventual, global, session)
+  # @attr [String] sql_metastore_db_type, Which SQL driver to use (mysql, postgres, oracle), defaults to mysql
   # @attr [String] dynamo_db_endpoint, An optional endpoint URL (for dynamodb metastore)
   # @attr [String] dynamo_db_region, The AWS region for DynamoDB requests (for dynamodb metastore)
   # @attr [String] dynamo_db_table_name, The table name for DynamoDB (for dynamodb metastore)
@@ -29,6 +30,7 @@ module Asherah
       metastore: :Metastore,
       connection_string: :ConnectionString,
       replica_read_consistency: :ReplicaReadConsistency,
+      sql_metastore_db_type: :SQLMetastoreDBType,
       dynamo_db_endpoint: :DynamoDBEndpoint,
       dynamo_db_region: :DynamoDBRegion,
       dynamo_db_table_name: :DynamoDBTableName,
@@ -45,6 +47,7 @@ module Asherah
 
     KMS_TYPES = ['static', 'aws', 'test-debug-static'].freeze
     METASTORE_TYPES = ['rdbms', 'dynamodb', 'memory', 'test-debug-memory'].freeze
+    SQL_METASTORE_DB_TYPES = ['mysql', 'postgres', 'oracle'].freeze
 
     attr_accessor(*MAPPING.keys)
 
@@ -53,6 +56,7 @@ module Asherah
       validate_product_id
       validate_kms
       validate_metastore
+      validate_sql_metastore_db_type
       validate_kms_attributes
     end
 
@@ -88,6 +92,15 @@ module Asherah
       raise Error::ConfigError, 'config.metastore not set' if metastore.nil?
       unless METASTORE_TYPES.include?(metastore)
         raise Error::ConfigError, "config.metastore must be one of these: #{METASTORE_TYPES.join(', ')}"
+      end
+    end
+
+    def validate_sql_metastore_db_type
+      return if sql_metastore_db_type.nil?
+
+      unless SQL_METASTORE_DB_TYPES.include?(sql_metastore_db_type)
+        raise Error::ConfigError,
+              "config.sql_metastore_db_type must be one of these: #{SQL_METASTORE_DB_TYPES.join(', ')}"
       end
     end
 

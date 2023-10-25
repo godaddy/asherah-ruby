@@ -5,8 +5,8 @@ RSpec.describe Asherah::Config do
     lambda do |config|
       config.service_name = 'gem'
       config.product_id = 'sable'
-      config.kms = 'static'
-      config.metastore = 'memory'
+      config.kms = 'test-debug-static'
+      config.metastore = 'test-debug-memory'
     end
   }
 
@@ -37,6 +37,16 @@ RSpec.describe Asherah::Config do
   end
 
   describe '#validate_kms' do
+    it 'accepts valid sql_metastore_db_type value' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.kms = 'test-debug-static'
+        end
+      }.not_to raise_error
+      Asherah.shutdown
+    end
+
     it 'raises an error when kms not set' do
       expect {
         Asherah.configure do |config|
@@ -56,30 +66,6 @@ RSpec.describe Asherah::Config do
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
         expect(e.message).to eq('config.kms must be one of these: static, aws, test-debug-static')
-      end
-    end
-  end
-
-  describe '#validate_metastore' do
-    it 'raises an error when metastore not set' do
-      expect {
-        Asherah.configure do |config|
-          base_config.call(config)
-          config.metastore = nil
-        end
-      }.to raise_error(Asherah::Error::ConfigError) do |e|
-        expect(e.message).to eq('config.metastore not set')
-      end
-    end
-
-    it 'raises an error when metastore is invalid' do
-      expect {
-        Asherah.configure do |config|
-          base_config.call(config)
-          config.metastore = 'other'
-        end
-      }.to raise_error(Asherah::Error::ConfigError) do |e|
-        expect(e.message).to eq('config.metastore must be one of these: rdbms, dynamodb, memory, test-debug-memory')
       end
     end
   end
@@ -117,6 +103,63 @@ RSpec.describe Asherah::Config do
         end
       }.to raise_error(Asherah::Error::ConfigError) do |e|
         expect(e.message).to eq('config.preferred_region not set')
+      end
+    end
+  end
+
+  describe '#validate_metastore' do
+    it 'accepts valid metastore value' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.metastore = 'test-debug-memory'
+        end
+      }.not_to raise_error
+      Asherah.shutdown
+    end
+
+    it 'raises an error when metastore not set' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.metastore = nil
+        end
+      }.to raise_error(Asherah::Error::ConfigError) do |e|
+        expect(e.message).to eq('config.metastore not set')
+      end
+    end
+
+    it 'raises an error when metastore is invalid' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.metastore = 'other'
+        end
+      }.to raise_error(Asherah::Error::ConfigError) do |e|
+        expect(e.message).to eq('config.metastore must be one of these: rdbms, dynamodb, memory, test-debug-memory')
+      end
+    end
+  end
+
+  describe '#validate_sql_metastore_db_type' do
+    it 'accepts valid sql_metastore_db_type value' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.sql_metastore_db_type = 'postgres'
+        end
+      }.not_to raise_error
+      Asherah.shutdown
+    end
+
+    it 'raises an error when sql_metastore_db_type is invalid' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.sql_metastore_db_type = 'other'
+        end
+      }.to raise_error(Asherah::Error::ConfigError) do |e|
+        expect(e.message).to eq('config.sql_metastore_db_type must be one of these: mysql, postgres, oracle')
       end
     end
   end
