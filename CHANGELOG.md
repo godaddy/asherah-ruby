@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.5.2] - 2024-01-15
+
+- Upgrade to use asherah-cobhan v0.4.32
+
 ## [0.5.1] - 2023-10-25
 
 - Add `sql_metastore_db_type` config option to support PostgresSQL adapter for Asherah
