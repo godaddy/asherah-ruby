@@ -23,7 +23,17 @@ module Asherah
     def self.check_result!(result, message)
       return unless result.negative?
 
-      error_class = Error::CODES.fetch(result, StandardError)
+      # Use case statement for better performance than hash lookup
+      error_class = case result
+                    when -100 then NotInitialized
+                    when -101 then AlreadyInitialized
+                    when -102 then GetSessionFailed
+                    when -103 then EncryptFailed
+                    when -104 then DecryptFailed
+                    when -105 then BadConfig
+                    else StandardError
+                    end
+      
       raise error_class, "#{message} (#{result})"
     end
   end
