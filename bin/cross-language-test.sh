@@ -16,6 +16,8 @@ git clone https://github.com/godaddy/asherah.git .
 
 # Install Go packages
 cd $ASHERAH_GO_TEST_DIR
+# Fix invalid toolchain directive
+sed -i.bak '/^toolchain/d' go.mod
 go build ./...
 go mod edit -replace github.com/godaddy/asherah/go/appencryption=../../../go/appencryption
 go mod tidy
