@@ -95,7 +95,11 @@ module Asherah
     def decrypt(partition_id, json)
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
-      output_buffer = allocate_cbuffer(json.bytesize)
+      # Allocate buffer with safety margin for base64 decoded data
+      # JSON contains base64 encoded encrypted data, decoded data could be ~25% smaller
+      # but we add margin to ensure sufficient space for any overhead
+      estimated_buffer_size = (json.bytesize * 1.2).to_i
+      output_buffer = allocate_cbuffer(estimated_buffer_size)
 
       result = DecryptFromJson(partition_id_buffer, data_buffer, output_buffer)
       Error.check_result!(result, 'DecryptFromJson failed')
