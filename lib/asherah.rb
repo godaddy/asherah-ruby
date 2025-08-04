@@ -12,9 +12,6 @@ require 'json'
 # Asherah is a Ruby wrapper around Asherah Go application-layer encryption SDK.
 module Asherah
   extend Cobhan
-  include Validation
-  include CryptoOperations
-  include Configuration
 
   LIB_ROOT_PATH = File.expand_path('asherah/native', __dir__)
   load_library(LIB_ROOT_PATH, 'libasherah', [
@@ -30,6 +27,9 @@ module Asherah
   BASE64_OVERHEAD = 1.34
 
   class << self
+    include Validation
+    include CryptoOperations
+    include Configuration
     def set_env(env = {})
       raise ArgumentError, 'env must be a Hash' unless env.is_a?(Hash)
 
