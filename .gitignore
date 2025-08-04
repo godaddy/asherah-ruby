@@ -14,3 +14,6 @@ Gemfile.lock
 lib/asherah/native/
 
 .env.secrets
+
+# Bundler vendor directory
+vendor/bundle/

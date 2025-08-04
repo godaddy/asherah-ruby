@@ -49,10 +49,10 @@ class NativeFile
         tries += 1
         # Validate VERSION format to prevent URL injection
         raise ArgumentError, "Invalid version format: #{VERSION}" unless VERSION.match?(/\A[a-zA-Z0-9._-]+\z/)
-        
+
         # Validate file_name to prevent path traversal
         raise ArgumentError, "Invalid file name: #{file_name}" unless file_name.match?(/\A[a-zA-Z0-9._-]+\z/)
-        
+
         # Use URI.join for safer URL construction
         base_url = "https://github.com/godaddy/asherah-cobhan/releases/download/#{VERSION}/"
         url = URI.join(base_url, file_name).to_s
