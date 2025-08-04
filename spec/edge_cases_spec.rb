@@ -159,4 +159,3 @@ RSpec.describe 'Asherah edge cases' do
     end
   end
 end
-
