@@ -4,6 +4,7 @@ require_relative 'asherah/version'
 require 'asherah/config'
 require 'asherah/error'
 require 'cobhan'
+require 'json'
 
 # Asherah is a Ruby wrapper around Asherah Go application-layer encryption SDK.
 module Asherah
@@ -33,6 +34,8 @@ module Asherah
     # @param env [Hash], Key-value pairs to set Asherah ENV
     # @return [void]
     def set_env(env = {})
+      raise ArgumentError, 'env must be a Hash' unless env.is_a?(Hash)
+
       # NOTE: set_env does not require initialization
       # This is intentional as environment variables may need to be set before init
       env_buffer = string_to_cbuffer(env.to_json)
@@ -82,9 +85,7 @@ module Asherah
     def encrypt(partition_id, data)
       raise Asherah::Error::NotInitialized unless @initialized
 
-      # Basic input validation
-      raise ArgumentError, 'partition_id cannot be nil' if partition_id.nil?
-      raise ArgumentError, 'data cannot be nil' if data.nil?
+      validate_encrypt_params(partition_id, data)
 
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
@@ -107,9 +108,7 @@ module Asherah
     def decrypt(partition_id, json)
       raise Asherah::Error::NotInitialized unless @initialized
 
-      # Basic input validation
-      raise ArgumentError, 'partition_id cannot be nil' if partition_id.nil?
-      raise ArgumentError, 'json cannot be nil' if json.nil?
+      validate_decrypt_params(partition_id, json)
 
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
@@ -132,6 +131,43 @@ module Asherah
     end
 
     private
+
+    def validate_encrypt_params(partition_id, data)
+      validate_string_param(partition_id, 'partition_id', 1024)
+      validate_string_param(data, 'data', 100 * 1024 * 1024)
+    end
+
+    def validate_decrypt_params(partition_id, json)
+      validate_string_param(partition_id, 'partition_id', 1024)
+      validate_string_param(json, 'json', 10 * 1024 * 1024)
+      validate_json_format(json)
+    end
+
+    def validate_string_param(value, name, max_size)
+      raise ArgumentError, "#{name} cannot be nil" if value.nil?
+      raise ArgumentError, "#{name} must be a String" unless value.is_a?(String)
+      # Allow empty strings for data, but not for partition_id or json
+      if value.empty? && (name == 'partition_id' || name == 'json')
+        raise ArgumentError, "#{name} cannot be empty"
+      end
+      # Format message based on size
+      if name == 'partition_id'
+        raise ArgumentError, "#{name} too long (max 1KB)" if value.bytesize > max_size
+      else
+        size_unit = max_size >= 1024 * 1024 ? "#{max_size / (1024 * 1024)}MB" : "#{max_size / 1024}KB"
+        raise ArgumentError, "#{name} too large (max #{size_unit})" if value.bytesize > max_size
+      end
+    end
+
+    def validate_json_format(json)
+      return if json.empty?  # Already handled in validate_string_param
+      begin
+        parsed = JSON.parse(json)
+        raise ArgumentError, 'json must be valid JSON format' unless parsed.is_a?(Hash)
+      rescue JSON::ParserError
+        raise ArgumentError, 'json must be valid JSON format'
+      end
+    end
 
     def estimate_buffer(data_bytesize, partition_bytesize)
       ESTIMATED_ENVELOPE_OVERHEAD +
