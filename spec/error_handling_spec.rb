@@ -82,4 +82,3 @@ RSpec.describe 'Asherah error handling' do
     end
   end
 end
-
