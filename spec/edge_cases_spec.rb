@@ -126,7 +126,7 @@ RSpec.describe 'Asherah edge cases' do
       # Validate nested structure
       expect(parsed['Key']).to be_a(Hash)
       expect(parsed['Key']).to have_key('Created')
-      expect(parsed['Key']).to have_key('EncryptedKey')
+      expect(parsed['Key']).to have_key('Key')
       expect(parsed['Key']).to have_key('ParentKeyMeta')
     end
 

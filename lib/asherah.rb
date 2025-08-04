@@ -81,6 +81,10 @@ module Asherah
     # @return [String], DataRowRecord in JSON format
     def encrypt(partition_id, data)
       raise Asherah::Error::NotInitialized unless @initialized
+      
+      # Basic input validation
+      raise ArgumentError, 'partition_id cannot be nil' if partition_id.nil?
+      raise ArgumentError, 'data cannot be nil' if data.nil?
 
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
@@ -102,6 +106,10 @@ module Asherah
     # @return [String], Decrypted data
     def decrypt(partition_id, json)
       raise Asherah::Error::NotInitialized unless @initialized
+      
+      # Basic input validation
+      raise ArgumentError, 'partition_id cannot be nil' if partition_id.nil?
+      raise ArgumentError, 'json cannot be nil' if json.nil?
 
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
