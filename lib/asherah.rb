@@ -30,6 +30,7 @@ module Asherah
     include Validation
     include CryptoOperations
     include Configuration
+
     # Set environment variables needed by Asherah dependencies for when
     # Go os.Getenv() doesn't see variables set by C.setenv().
     # References:
