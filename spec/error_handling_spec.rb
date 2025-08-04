@@ -18,11 +18,8 @@ RSpec.describe 'Asherah error handling' do
       }.to raise_error(Asherah::Error::NotInitialized)
     end
 
-    it 'raises NotInitialized error when setting env without configuration' do
-      expect {
-        Asherah.set_env('KEY' => 'value')
-      }.to raise_error(Asherah::Error::NotInitialized)
-    end
+    # Note: set_env does not require initialization as environment
+    # variables may need to be set before Asherah is configured
 
     it 'raises NotInitialized error when shutting down without configuration' do
       expect {

@@ -33,10 +33,14 @@ module Asherah
     # @param env [Hash], Key-value pairs to set Asherah ENV
     # @return [void]
     def set_env(env = {})
+      # Note: set_env does not require initialization
+      # This is intentional as environment variables may need to be set before init
       env_buffer = string_to_cbuffer(env.to_json)
 
       result = SetEnv(env_buffer)
       Error.check_result!(result, 'SetEnv failed')
+    ensure
+      env_buffer&.free
     end
 
     # Configures Asherah
@@ -74,6 +78,8 @@ module Asherah
     # @param data [String]
     # @return [String], DataRowRecord in JSON format
     def encrypt(partition_id, data)
+      raise Asherah::Error::NotInitialized unless @initialized
+
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
       estimated_buffer_bytesize = estimate_buffer(data.bytesize, partition_id.bytesize)
@@ -93,6 +99,8 @@ module Asherah
     # @param json [String], DataRowRecord in JSON format
     # @return [String], Decrypted data
     def decrypt(partition_id, json)
+      raise Asherah::Error::NotInitialized unless @initialized
+
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
       output_buffer = allocate_cbuffer(json.bytesize)
