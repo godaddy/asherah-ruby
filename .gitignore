@@ -17,3 +17,4 @@ lib/asherah/native/
 
 # Bundler vendor directory
 vendor/bundle/
+vendor/
