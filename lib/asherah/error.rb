@@ -23,18 +23,22 @@ module Asherah
     def self.check_result!(result, message)
       return unless result.negative?
 
-      # Use case statement for better performance than hash lookup
-      error_class = case result
-                    when -100 then NotInitialized
-                    when -101 then AlreadyInitialized
-                    when -102 then GetSessionFailed
-                    when -103 then EncryptFailed
-                    when -104 then DecryptFailed
-                    when -105 then BadConfig
-                    else StandardError
-                    end
-      
+      error_class = error_for_code(result)
       raise error_class, "#{message} (#{result})"
     end
+
+    def self.error_for_code(code)
+      # Use case statement for better performance than hash lookup
+      case code
+      when -100 then NotInitialized
+      when -101 then AlreadyInitialized
+      when -102 then GetSessionFailed
+      when -103 then EncryptFailed
+      when -104 then DecryptFailed
+      when -105 then BadConfig
+      else StandardError
+      end
+    end
+    private_class_method :error_for_code
   end
 end
