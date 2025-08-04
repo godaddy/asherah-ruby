@@ -33,7 +33,7 @@ module Asherah
     # @param env [Hash], Key-value pairs to set Asherah ENV
     # @return [void]
     def set_env(env = {})
-      # Note: set_env does not require initialization
+      # NOTE: set_env does not require initialization
       # This is intentional as environment variables may need to be set before init
       env_buffer = string_to_cbuffer(env.to_json)
 
@@ -81,7 +81,7 @@ module Asherah
     # @return [String], DataRowRecord in JSON format
     def encrypt(partition_id, data)
       raise Asherah::Error::NotInitialized unless @initialized
-      
+
       # Basic input validation
       raise ArgumentError, 'partition_id cannot be nil' if partition_id.nil?
       raise ArgumentError, 'data cannot be nil' if data.nil?
@@ -106,7 +106,7 @@ module Asherah
     # @return [String], Decrypted data
     def decrypt(partition_id, json)
       raise Asherah::Error::NotInitialized unless @initialized
-      
+
       # Basic input validation
       raise ArgumentError, 'partition_id cannot be nil' if partition_id.nil?
       raise ArgumentError, 'json cannot be nil' if json.nil?

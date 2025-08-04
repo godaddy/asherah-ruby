@@ -3,8 +3,9 @@
 RSpec.describe 'Asherah error handling' do
   describe 'uninitialized state errors' do
     # Skip the before(:each) hook that initializes Asherah
-    before(:each) { }
-    after(:each) { }
+    # Using nil to explicitly skip hook setup
+    before(:each) { nil }
+    after(:each) { nil }
 
     it 'raises NotInitialized error when encrypting without configuration' do
       expect {
@@ -18,7 +19,7 @@ RSpec.describe 'Asherah error handling' do
       }.to raise_error(Asherah::Error::NotInitialized)
     end
 
-    # Note: set_env does not require initialization as environment
+    # NOTE: set_env does not require initialization as environment
     # variables may need to be set before Asherah is configured
 
     it 'raises NotInitialized error when shutting down without configuration' do
@@ -57,9 +58,15 @@ RSpec.describe 'Asherah error handling' do
   describe 'error result handling' do
     it 'converts negative error codes to appropriate exceptions' do
       # Test each error code mapping
-      expect { Asherah::Error.check_result!(-100, 'test') }.to raise_error(Asherah::Error::NotInitialized, 'test (-100)')
-      expect { Asherah::Error.check_result!(-101, 'test') }.to raise_error(Asherah::Error::AlreadyInitialized, 'test (-101)')
-      expect { Asherah::Error.check_result!(-102, 'test') }.to raise_error(Asherah::Error::GetSessionFailed, 'test (-102)')
+      expect {
+        Asherah::Error.check_result!(-100, 'test')
+      }.to raise_error(Asherah::Error::NotInitialized, 'test (-100)')
+      expect {
+        Asherah::Error.check_result!(-101, 'test')
+      }.to raise_error(Asherah::Error::AlreadyInitialized, 'test (-101)')
+      expect {
+        Asherah::Error.check_result!(-102, 'test')
+      }.to raise_error(Asherah::Error::GetSessionFailed, 'test (-102)')
       expect { Asherah::Error.check_result!(-103, 'test') }.to raise_error(Asherah::Error::EncryptFailed, 'test (-103)')
       expect { Asherah::Error.check_result!(-104, 'test') }.to raise_error(Asherah::Error::DecryptFailed, 'test (-104)')
       expect { Asherah::Error.check_result!(-105, 'test') }.to raise_error(Asherah::Error::BadConfig, 'test (-105)')
@@ -75,3 +82,4 @@ RSpec.describe 'Asherah error handling' do
     end
   end
 end
+

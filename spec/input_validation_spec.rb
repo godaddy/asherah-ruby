@@ -46,14 +46,14 @@ RSpec.describe 'Asherah input validation' do
     end
 
     it 'raises ArgumentError for partition_id exceeding size limit' do
-      large_partition = 'a' * 1025  # Just over 1KB
+      large_partition = 'a' * 1025 # Just over 1KB
       expect {
         Asherah.encrypt(large_partition, 'data')
       }.to raise_error(ArgumentError, 'partition_id too long (max 1KB)')
     end
 
     it 'raises ArgumentError for data exceeding size limit' do
-      large_data = 'a' * (100 * 1024 * 1024 + 1)  # Just over 100MB
+      large_data = 'a' * ((100 * 1024 * 1024) + 1) # Just over 100MB
       expect {
         Asherah.encrypt('partition', large_data)
       }.to raise_error(ArgumentError, 'data too large (max 100MB)')
@@ -106,7 +106,7 @@ RSpec.describe 'Asherah input validation' do
     end
 
     it 'raises ArgumentError for partition_id exceeding size limit' do
-      large_partition = 'a' * 1025  # Just over 1KB
+      large_partition = 'a' * 1025 # Just over 1KB
       expect {
         Asherah.decrypt(large_partition, valid_json)
       }.to raise_error(ArgumentError, 'partition_id too long (max 1KB)')
@@ -114,7 +114,7 @@ RSpec.describe 'Asherah input validation' do
 
     it 'raises ArgumentError for json exceeding size limit' do
       # Create a fake large JSON that looks valid
-      large_json = '{"data": "' + 'a' * (10 * 1024 * 1024) + '"}'
+      large_json = "{\"data\": \"#{'a' * (10 * 1024 * 1024)}\"}"
       expect {
         Asherah.decrypt('partition', large_json)
       }.to raise_error(ArgumentError, 'json too large (max 10MB)')

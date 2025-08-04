@@ -42,7 +42,7 @@ RSpec.describe 'Asherah edge cases' do
     end
 
     it 'handles maximum allowed partition_id size' do
-      partition_1kb = 'p' * 1024  # Exactly 1KB
+      partition_1kb = 'p' * 1024 # Exactly 1KB
       json = Asherah.encrypt(partition_1kb, 'data')
       result = Asherah.decrypt(partition_1kb, json)
       expect(result).to eq('data')
@@ -104,10 +104,10 @@ RSpec.describe 'Asherah edge cases' do
     it 'handles interleaved operations with different partitions' do
       json1 = Asherah.encrypt('partition1', 'data1')
       json2 = Asherah.encrypt('partition2', 'data2')
-      
+
       result2 = Asherah.decrypt('partition2', json2)
       result1 = Asherah.decrypt('partition1', json1)
-      
+
       expect(result1).to eq('data1')
       expect(result2).to eq('data2')
     end
@@ -116,13 +116,13 @@ RSpec.describe 'Asherah edge cases' do
   describe 'DataRowRecord structure validation' do
     it 'produces valid JSON structure from encrypt' do
       json_string = Asherah.encrypt('partition', 'data')
-      
+
       # Parse and validate structure
       parsed = JSON.parse(json_string)
       expect(parsed).to be_a(Hash)
       expect(parsed).to have_key('Data')
       expect(parsed).to have_key('Key')
-      
+
       # Validate nested structure
       expect(parsed['Key']).to be_a(Hash)
       expect(parsed['Key']).to have_key('Created')
@@ -149,7 +149,7 @@ RSpec.describe 'Asherah edge cases' do
     end
 
     it 'handles varying data sizes in sequence' do
-      sizes = [10, 100, 1000, 10000, 100000]
+      sizes = [10, 100, 1000, 10_000, 100_000]
       sizes.each do |size|
         data = 'z' * size
         json = Asherah.encrypt('partition', data)
@@ -159,3 +159,4 @@ RSpec.describe 'Asherah edge cases' do
     end
   end
 end
+
