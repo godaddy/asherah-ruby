@@ -30,6 +30,7 @@ module Asherah
     include Validation
     include CryptoOperations
     include Configuration
+
     def set_env(env = {})
       raise ArgumentError, 'env must be a Hash' unless env.is_a?(Hash)
 
