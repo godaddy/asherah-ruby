@@ -18,7 +18,7 @@ task :download do
   end
 end
 
-task default: %i[spec rubocop]
+task default: [:spec, :rubocop]
 task spec: :download
 
 desc 'Print current version'

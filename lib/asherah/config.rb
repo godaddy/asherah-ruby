@@ -105,11 +105,10 @@ module Asherah
     end
 
     def validate_kms_attributes
-      if kms == 'aws'
-        raise Error::ConfigError, 'config.region_map not set' if region_map.nil?
-        raise Error::ConfigError, 'config.region_map must be a Hash' unless region_map.is_a?(Hash)
-        raise Error::ConfigError, 'config.preferred_region not set' if preferred_region.nil?
-      end
+      return unless kms == 'aws'
+      raise Error::ConfigError, 'config.region_map not set' if region_map.nil?
+      raise Error::ConfigError, 'config.region_map must be a Hash' unless region_map.is_a?(Hash)
+      raise Error::ConfigError, 'config.preferred_region not set' if preferred_region.nil?
     end
   end
 end

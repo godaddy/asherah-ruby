@@ -4,10 +4,10 @@ RSpec.describe 'Asherah KMS integration' do
   let(:partition_id) { 'user_1' }
 
   it 'encrypts and decrypts using KMS' do
-    kms_key_arn = ENV.fetch('KMS_KEY_ARN') do
+    kms_key_arn = ENV.fetch('KMS_KEY_ARN') {
       @disable_shutdown = true
       skip 'KMS_KEY_ARN env var is not set'
-    end
+    }
 
     Asherah.configure do |config|
       config.service_name = 'gem'
