@@ -37,6 +37,8 @@ module Asherah
 
       result = SetEnv(env_buffer)
       Error.check_result!(result, 'SetEnv failed')
+    ensure
+      env_buffer&.free
     end
 
     # Configures Asherah
@@ -74,6 +76,8 @@ module Asherah
     # @param data [String]
     # @return [String], DataRowRecord in JSON format
     def encrypt(partition_id, data)
+      raise Asherah::Error::NotInitialized unless @initialized
+
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(data)
       estimated_buffer_bytesize = estimate_buffer(data.bytesize, partition_id.bytesize)
@@ -84,7 +88,7 @@ module Asherah
 
       cbuffer_to_string(output_buffer)
     ensure
-      [partition_id_buffer, data_buffer, output_buffer].map(&:free)
+      [partition_id_buffer, data_buffer, output_buffer].compact.each(&:free)
     end
 
     # Decrypts a DataRowRecord in JSON format for a partition_id and returns decrypted data.
@@ -93,6 +97,8 @@ module Asherah
     # @param json [String], DataRowRecord in JSON format
     # @return [String], Decrypted data
     def decrypt(partition_id, json)
+      raise Asherah::Error::NotInitialized unless @initialized
+
       partition_id_buffer = string_to_cbuffer(partition_id)
       data_buffer = string_to_cbuffer(json)
       output_buffer = allocate_cbuffer(json.bytesize)
@@ -102,7 +108,7 @@ module Asherah
 
       cbuffer_to_string(output_buffer)
     ensure
-      [partition_id_buffer, data_buffer, output_buffer].map(&:free)
+      [partition_id_buffer, data_buffer, output_buffer].compact.each(&:free)
     end
 
     # Stop the Asherah instance
@@ -119,7 +125,7 @@ module Asherah
       ESTIMATED_ENVELOPE_OVERHEAD +
         @intermediated_key_overhead_bytesize +
         partition_bytesize +
-        ((data_bytesize + ESTIMATED_ENCRYPTION_OVERHEAD) * BASE64_OVERHEAD)
+        ((data_bytesize + ESTIMATED_ENCRYPTION_OVERHEAD) * BASE64_OVERHEAD).to_i
     end
   end
 end
