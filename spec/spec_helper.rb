@@ -11,7 +11,9 @@ if ENV.fetch('COVERAGE', nil) == 'true'
 end
 
 require 'dotenv'
-Dotenv.overload('.env', '.env.secrets')
+# Only load env files if they exist to avoid CI failures
+env_files = ['.env', '.env.secrets'].select { |file| File.exist?(file) }
+Dotenv.overload(*env_files) if env_files.any?
 
 require 'asherah'
 

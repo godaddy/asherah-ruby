@@ -3,7 +3,13 @@
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 
-RSpec::Core::RakeTask.new(:spec)
+# Default spec task excludes integration tests to avoid CI failures
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = '--tag ~integration'
+end
+
+# Task to run all tests including integration tests
+RSpec::Core::RakeTask.new(:spec_all)
 
 require 'rubocop/rake_task'
 

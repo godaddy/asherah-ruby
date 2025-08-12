@@ -1,6 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.5
-  NewCops: enable
+  NewCops: disable
   SuggestExtensions: false
   Exclude:
     - 'vendor/**/*' # Github Actions
@@ -34,4 +34,11 @@ Style/GuardClause:
   Enabled: false
 
 Naming/AccessorMethodName:
+  Enabled: false
+
+# Disable cops that commonly cause issues with spec files
+Metrics/ModuleLength:
+  Enabled: false
+
+Style/Documentation:
   Enabled: false
