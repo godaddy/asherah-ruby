@@ -36,4 +36,5 @@ Gem::Specification.new do |spec|
   spec.extensions = ['ext/asherah/extconf.rb']
 
   spec.add_dependency 'cobhan', '~> 0.2.0'
+  spec.add_dependency 'mutex_m'
 end

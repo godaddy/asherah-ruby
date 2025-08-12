@@ -4,10 +4,12 @@ require_relative 'asherah/version'
 require 'asherah/config'
 require 'asherah/error'
 require 'cobhan'
+require 'mutex_m'
 
 # Asherah is a Ruby wrapper around Asherah Go application-layer encryption SDK.
 module Asherah
   extend Cobhan
+  extend Mutex_m
 
   LIB_ROOT_PATH = File.expand_path('asherah/native', __dir__)
   load_library(LIB_ROOT_PATH, 'libasherah', [
@@ -44,18 +46,20 @@ module Asherah
     # @yield [Config]
     # @return [void]
     def configure
-      raise Asherah::Error::AlreadyInitialized if @initialized
+      synchronize do
+        raise Asherah::Error::AlreadyInitialized if @initialized
 
-      config = Config.new
-      yield config
-      config.validate!
-      @intermediated_key_overhead_bytesize = config.product_id.bytesize + config.service_name.bytesize
+        config = Config.new
+        yield config
+        config.validate!
+        @intermediated_key_overhead_bytesize = config.product_id.bytesize + config.service_name.bytesize
 
-      config_buffer = string_to_cbuffer(config.to_json)
+        config_buffer = string_to_cbuffer(config.to_json)
 
-      result = SetupJson(config_buffer)
-      Error.check_result!(result, 'SetupJson failed')
-      @initialized = true
+        result = SetupJson(config_buffer)
+        Error.check_result!(result, 'SetupJson failed')
+        @initialized = true
+      end
     end
 
     # Encrypts data for a given partition_id and returns DataRowRecord in JSON format.
@@ -107,10 +111,12 @@ module Asherah
 
     # Stop the Asherah instance
     def shutdown
-      raise Asherah::Error::NotInitialized unless @initialized
+      synchronize do
+        raise Asherah::Error::NotInitialized unless @initialized
 
-      Shutdown()
-      @initialized = false
+        Shutdown()
+        @initialized = false
+      end
     end
 
     private
