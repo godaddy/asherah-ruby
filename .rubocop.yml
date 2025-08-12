@@ -71,9 +71,14 @@ Style/BlockDelimiters:
     - subject
     - before
     - after
+  Exclude:
+    - 'asherah.gemspec'
+    - 'ext/asherah/native_file.rb'
 
 Style/GuardClause:
   MinBodyLength: 3
+  Exclude:
+    - 'ext/asherah/native_file.rb'
 
 # Naming cop adjustment
 Naming/AccessorMethodName:

@@ -27,9 +27,9 @@ class NativeFile
         return
       end
 
-      checksum = CHECKSUMS.fetch(file_name) {
+      checksum = CHECKSUMS.fetch(file_name) do
         abort "Unsupported platform #{RUBY_PLATFORM}"
-      }
+      end
 
       content = download_content(file_name)
 
@@ -51,11 +51,13 @@ class NativeFile
         puts "Downloading #{url}"
         URI.parse(url).open.read
       rescue Net::OpenTimeout, Net::ReadTimeout => e
-        raise e unless tries <= RETRIES
-
-        puts "Got #{e.class}... retrying in #{RETRY_DELAY} seconds"
-        sleep RETRY_DELAY
-        retry
+        if tries <= RETRIES
+          puts "Got #{e.class}... retrying in #{RETRY_DELAY} seconds"
+          sleep RETRY_DELAY
+          retry
+        else
+          raise e
+        end
       end
     end
   end
