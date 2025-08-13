@@ -6,7 +6,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'cucumber', '~> 7.1.0'
-gem 'dotenv', '~> 2.7.6'
+gem 'dotenv', '~> 2.8.1'
 gem 'rake', '~> 13.0'
 gem 'rspec', '~> 3.10.0'
 gem 'rubocop', '~> 1.7'
