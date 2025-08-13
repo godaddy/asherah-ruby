@@ -84,7 +84,7 @@ module Asherah
 
       cbuffer_to_string(output_buffer)
     ensure
-      [partition_id_buffer, data_buffer, output_buffer].map(&:free)
+      [partition_id_buffer, data_buffer, output_buffer].compact.each(&:free)
     end
 
     # Decrypts a DataRowRecord in JSON format for a partition_id and returns decrypted data.
@@ -102,7 +102,7 @@ module Asherah
 
       cbuffer_to_string(output_buffer)
     ensure
-      [partition_id_buffer, data_buffer, output_buffer].map(&:free)
+      [partition_id_buffer, data_buffer, output_buffer].compact.each(&:free)
     end
 
     # Stop the Asherah instance
