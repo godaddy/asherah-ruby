@@ -37,6 +37,8 @@ module Asherah
 
       result = SetEnv(env_buffer)
       Error.check_result!(result, 'SetEnv failed')
+    ensure
+      env_buffer&.free
     end
 
     # Configures Asherah
