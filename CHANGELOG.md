@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.7.0] - 2025-08-15
+
+- Fix memory leak risks in buffer management
+- Fix inconsistent NotInitialized error handling across all methods
+- Fix overly permissive RuboCop configuration
+- Add Dependabot configuration for automated dependency updates
+- Update dependencies and Github actions
+- Update Go version to 1.24 for cross-language tests
+
 ## [0.6.0] - 2025-03-19
 
 - Upgrade to use asherah-cobhan v0.4.35
