@@ -47,7 +47,7 @@ class NativeFile
 
       begin
         tries += 1
-        url = "https://github.com/godaddy/asherah-cobhan/releases/download/#{VERSION}/#{file_name}"
+        url = "https://github.com/godaddy/asherah-ffi/releases/download/#{VERSION}/#{file_name}"
         puts "Downloading #{url}"
         URI.parse(url).open.read
       rescue Net::OpenTimeout, Net::ReadTimeout => e
