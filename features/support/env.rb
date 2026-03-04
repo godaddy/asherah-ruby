@@ -10,7 +10,7 @@ DB_NAME           = ENV.fetch('TEST_DB_NAME')
 DB_USER           = ENV.fetch('TEST_DB_USER')
 DB_PASS           = ENV.fetch('TEST_DB_PASSWORD')
 DB_PORT           = ENV.fetch('TEST_DB_PORT')
-DB_HOST           = 'localhost'
+DB_HOST           = ENV.fetch('TEST_DB_HOSTNAME', 'localhost')
 CONNECTION_STRING = "#{DB_USER}:#{DB_PASS}@tcp(#{DB_HOST}:#{DB_PORT})/#{DB_NAME}?tls=skip-verify"
 TMP_DIR           = '/tmp/'
 FILE_NAME         = 'ruby_encrypted'
