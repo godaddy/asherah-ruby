@@ -145,16 +145,6 @@ jobs:
         run: |
           bundle exec rake download
 
-      - name: Initialize RDBMS metastore
-        run: |
-          mysql -h ${{ env.MYSQL_HOSTNAME }} -P${{ job.services.mysql.ports[3306] }} -u ${{ env.MYSQL_USERNAME }} -p${{ env.MYSQL_PASSWORD }} -e "CREATE TABLE ${{ env.MYSQL_DATABASE }}.encryption_key (
-            id             VARCHAR(255) NOT NULL,
-            created        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            key_record     TEXT         NOT NULL,
-            PRIMARY KEY (id, created),
-            INDEX (created)
-          );"
-
       - name: Set up Go
         uses: actions/setup-go@v6.3.0
         with:

@@ -69,6 +69,22 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 For tests requiring secrets (AWS KMS, database credentials), copy `.env.secrets.example` to `.env.secrets` and fill in the required values. The `.env.secrets` file is already in `.gitignore` to prevent accidental commits.
 
+### Cross-Language Tests
+
+Cross-language tests verify that data encrypted with the Go implementation can be decrypted with the Ruby implementation and vice versa.
+
+**Prerequisites:**
+- MySQL running locally
+- Go 1.24+ installed
+
+**Running the tests:**
+
+```bash
+TEST_DB_PASSWORD=pass bin/cross-language-test.sh
+```
+
+See `bin/cross-language-test.sh` for available environment variables and their defaults.
+
 To install this gem onto your local machine, run `rake install`.
 
 To release a new version, update the version number in `version.rb`, create and push a version tag:
