@@ -95,6 +95,9 @@ Style/Documentation:
 Style/DocumentationMethod:
   Enabled: false # YARD comments are optional
 
+Style/EmptyClassDefinition:
+  Enabled: false
+
 # Additional cops for code quality
 Lint/UnusedMethodArgument:
   Enabled: true
