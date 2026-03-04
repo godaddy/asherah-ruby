@@ -163,4 +163,94 @@ RSpec.describe Asherah::Config do
       end
     end
   end
+
+  describe '#disable_zero_copy' do
+    it 'accepts disable_zero_copy as true' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.disable_zero_copy = true
+        end
+      }.not_to raise_error
+      Asherah.shutdown
+    end
+
+    it 'accepts disable_zero_copy as false' do
+      expect {
+        Asherah.configure do |config|
+          base_config.call(config)
+          config.disable_zero_copy = false
+        end
+      }.not_to raise_error
+      Asherah.shutdown
+    end
+  end
+
+  describe '#to_json' do
+    it 'correctly maps all configuration options to Go JSON format' do
+      config = Asherah::Config.new
+      config.service_name = 'test-service'
+      config.product_id = 'test-product'
+      config.kms = 'aws'
+      config.metastore = 'dynamodb'
+      config.connection_string = 'mysql://localhost:3306/test'
+      config.replica_read_consistency = 'eventual'
+      config.sql_metastore_db_type = 'postgres'
+      config.dynamo_db_endpoint = 'http://localhost:8000'
+      config.dynamo_db_region = 'us-west-2'
+      config.dynamo_db_table_name = 'test-table'
+      config.enable_region_suffix = true
+      config.region_map = { 'us-west-2' => 'arn' }
+      config.preferred_region = 'us-west-2'
+      config.session_cache_max_size = 500
+      config.session_cache_duration = 3600
+      config.enable_session_caching = true
+      config.disable_zero_copy = true
+      config.expire_after = 7200
+      config.check_interval = 1800
+      config.verbose = true
+
+      json_output = JSON.parse(config.to_json)
+
+      expect(json_output).to eq(
+        'ServiceName' => 'test-service',
+        'ProductID' => 'test-product',
+        'KMS' => 'aws',
+        'Metastore' => 'dynamodb',
+        'ConnectionString' => 'mysql://localhost:3306/test',
+        'ReplicaReadConsistency' => 'eventual',
+        'SQLMetastoreDBType' => 'postgres',
+        'DynamoDBEndpoint' => 'http://localhost:8000',
+        'DynamoDBRegion' => 'us-west-2',
+        'DynamoDBTableName' => 'test-table',
+        'EnableRegionSuffix' => true,
+        'RegionMap' => { 'us-west-2' => 'arn' },
+        'PreferredRegion' => 'us-west-2',
+        'SessionCacheMaxSize' => 500,
+        'SessionCacheDuration' => 3600,
+        'EnableSessionCaching' => true,
+        'DisableZeroCopy' => true,
+        'ExpireAfter' => 7200,
+        'CheckInterval' => 1800,
+        'Verbose' => true
+      )
+    end
+
+    it 'excludes nil values from JSON output' do
+      config = Asherah::Config.new
+      config.service_name = 'test-service'
+      config.product_id = 'test-product'
+      config.kms = 'test-debug-static'
+      config.metastore = 'test-debug-memory'
+
+      json_output = JSON.parse(config.to_json)
+
+      expect(json_output).to eq(
+        'ServiceName' => 'test-service',
+        'ProductID' => 'test-product',
+        'KMS' => 'test-debug-static',
+        'Metastore' => 'test-debug-memory'
+      )
+    end
+  end
 end
