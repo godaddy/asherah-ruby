@@ -200,7 +200,7 @@ RSpec.describe Asherah::Config do
       config.dynamo_db_region = 'us-west-2'
       config.dynamo_db_table_name = 'test-table'
       config.enable_region_suffix = true
-      config.region_map = { 'us-west-2' => 'arn:aws:kms:us-west-2:123456789012:key/12345678-1234-1234-1234-123456789012' }
+      config.region_map = { 'us-west-2' => 'arn' }
       config.preferred_region = 'us-west-2'
       config.session_cache_max_size = 500
       config.session_cache_duration = 3600
@@ -212,7 +212,7 @@ RSpec.describe Asherah::Config do
 
       json_output = JSON.parse(config.to_json)
 
-      expect(json_output).to eq({
+      expect(json_output).to eq(
         'ServiceName' => 'test-service',
         'ProductID' => 'test-product',
         'KMS' => 'aws',
@@ -224,7 +224,7 @@ RSpec.describe Asherah::Config do
         'DynamoDBRegion' => 'us-west-2',
         'DynamoDBTableName' => 'test-table',
         'EnableRegionSuffix' => true,
-        'RegionMap' => { 'us-west-2' => 'arn:aws:kms:us-west-2:123456789012:key/12345678-1234-1234-1234-123456789012' },
+        'RegionMap' => { 'us-west-2' => 'arn' },
         'PreferredRegion' => 'us-west-2',
         'SessionCacheMaxSize' => 500,
         'SessionCacheDuration' => 3600,
@@ -233,7 +233,7 @@ RSpec.describe Asherah::Config do
         'ExpireAfter' => 7200,
         'CheckInterval' => 1800,
         'Verbose' => true
-      })
+      )
     end
 
     it 'excludes nil values from JSON output' do
@@ -245,12 +245,12 @@ RSpec.describe Asherah::Config do
 
       json_output = JSON.parse(config.to_json)
 
-      expect(json_output).to eq({
+      expect(json_output).to eq(
         'ServiceName' => 'test-service',
         'ProductID' => 'test-product',
         'KMS' => 'test-debug-static',
         'Metastore' => 'test-debug-memory'
-      })
+      )
     end
   end
 end
