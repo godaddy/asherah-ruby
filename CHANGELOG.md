@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.8.0] - 2026-03-04
+
+- Upgrade to use asherah-cobhan v0.5.0
+- Expose disable_zero_copy config option to disable zero-copy FFI input buffers
+
 ## [0.7.0] - 2025-08-15
 
 - Fix memory leak risks in buffer management
