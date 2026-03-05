@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.8.1] - 2026-03-05
+
+- Upgrade to use asherah-cobhan v0.5.1
+- Fix buffer undersize from float truncation in estimate_buffer
+
 ## [0.8.0] - 2026-03-04
 
 - Upgrade to use asherah-cobhan v0.5.0

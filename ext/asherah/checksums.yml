@@ -1,5 +1,5 @@
-version:                v0.5.0
-libasherah-arm64.so:    8271298c357808d7e6daa4ca81ded8f39c1947a55043abe3b32359e0f5840a6c
-libasherah-x64.so:      645c0da7d1330db511c6724f08154cfae3959610bd709d60eded1c1420d2fce8
-libasherah-arm64.dylib: 909097bf62207e6927a0184e41859ccf42a62afd711cdadf69b8c5672939468b
-libasherah-x64.dylib:   e53ee66b7dd16ce587d5062e9eed8835f272653b6a91b4b5c5c1efd2ca97483e
+version:                v0.5.1
+libasherah-arm64.so:    eb1cf59da6e7006ba8044fa9b4ec471f32576f7edb1169e30f059c5f8815c044
+libasherah-x64.so:      16237a58335e86c510a20a0a6e9afa6502026e9f5fd374012db8ee9130f41eed
+libasherah-arm64.dylib: 03260e6552b7eb17b7cbe0cb6c16486bc4d17a110c1dc8ab9293cc4b678a8b80
+libasherah-x64.dylib:   df7d71223bdfc23afc29a5bf72e0294b12d632b63f135e7ac4194ec8d69c3766
