@@ -124,10 +124,12 @@ module Asherah
     private
 
     def estimate_buffer(data_bytesize, partition_bytesize)
+      est_data_len = (((data_bytesize + ESTIMATED_ENCRYPTION_OVERHEAD) * BASE64_OVERHEAD).to_i + 1)
+
       ESTIMATED_ENVELOPE_OVERHEAD +
         @intermediated_key_overhead_bytesize +
         partition_bytesize +
-        ((data_bytesize + ESTIMATED_ENCRYPTION_OVERHEAD) * BASE64_OVERHEAD)
+        est_data_len
     end
   end
 end
