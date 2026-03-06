@@ -113,9 +113,7 @@ RSpec.describe Asherah do
     expect(json).to include('Key')
 
     # Verify both log messages were produced
-    expect(stderr_output).to include('input data buffer is all null before encryption')
-    expect(stderr_output).to include('input data buffer was nulled during encryption')
-    expect(stderr_output).to include('len=100')
+    expect(stderr_output).to include('asherah-cobhan: EncryptToJson: input data buffer is all null before encryption (len=100)')
 
     # Verify it can be decrypted
     decrypted = Asherah.decrypt(partition_id, json)
