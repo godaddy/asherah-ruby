@@ -11,6 +11,25 @@ RSpec.describe Asherah do
     end
   }
 
+  def capture_stderr
+    r, w = IO.pipe
+    original_stderr = STDERR.dup
+    STDERR.reopen(w)
+
+    yield
+
+    STDERR.reopen(original_stderr)
+    w.close
+    output = r.read
+    r.close
+    original_stderr.close
+
+    output
+  ensure
+    STDERR.reopen(original_stderr) rescue nil
+    [original_stderr, w, r].each { |io| io.close rescue nil }
+  end
+
   before :each do
     Asherah.configure do |config|
       base_config.call(config)
@@ -71,5 +90,35 @@ RSpec.describe Asherah do
 
     # ENV set by CGO is visible in Ruby
     expect(ENV.fetch('VAR1')).to eq('VALUE1')
+  end
+
+  it 'encrypts null bytes with null_data_check enabled' do
+    Asherah.shutdown
+
+    # Configure with null_data_check enabled (will log warnings but not fail)
+    Asherah.configure do |config|
+      base_config.call(config)
+      config.null_data_check = true
+    end
+
+    # Capture stderr output from Go library
+    null_data = "\x00" * 100
+    json = nil
+    stderr_output = capture_stderr do
+      json = Asherah.encrypt(partition_id, null_data)
+    end
+
+    # Verify the encryption still works (it logs but doesn't fail)
+    expect(json).to include('Data')
+    expect(json).to include('Key')
+
+    # Verify both log messages were produced
+    expect(stderr_output).to include('input data buffer is all null before encryption')
+    expect(stderr_output).to include('input data buffer was nulled during encryption')
+    expect(stderr_output).to include('len=100')
+
+    # Verify it can be decrypted
+    decrypted = Asherah.decrypt(partition_id, json)
+    expect(decrypted).to eq(null_data)
   end
 end
