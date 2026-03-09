@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.8.2] - 2026-03-09
+
+- Upgrade to use asherah-cobhan v0.5.3
+- Add null_data_check configuration option
+
 ## [0.8.1] - 2026-03-05
 
 - Upgrade to use asherah-cobhan v0.5.1

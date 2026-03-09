@@ -11,6 +11,25 @@ RSpec.describe Asherah do
     end
   }
 
+  def capture_stderr
+    require 'tempfile'
+    tmpfile = Tempfile.new('stderr')
+    original_stderr = $stderr.dup
+    $stderr.reopen(tmpfile)
+
+    yield
+
+    $stderr.reopen(original_stderr)
+    tmpfile.rewind
+    tmpfile.read
+  ensure
+    unless original_stderr.closed?
+      $stderr.reopen(original_stderr)
+      original_stderr.close
+    end
+    tmpfile.close! unless tmpfile.closed?
+  end
+
   before :each do
     Asherah.configure do |config|
       base_config.call(config)
@@ -71,5 +90,25 @@ RSpec.describe Asherah do
 
     # ENV set by CGO is visible in Ruby
     expect(ENV.fetch('VAR1')).to eq('VALUE1')
+  end
+
+  it 'encrypts null bytes with null_data_check enabled' do
+    Asherah.shutdown
+    Asherah.configure do |config|
+      base_config.call(config)
+      config.null_data_check = true
+    end
+
+    null_data = "\x00" * 100
+    json = nil
+    stderr_output = capture_stderr { json = Asherah.encrypt(partition_id, null_data) }
+
+    expect(json).to include('Data')
+    expect(json).to include('Key')
+    expect(stderr_output).to include(
+      'asherah-cobhan: EncryptToJson: input data buffer is all null before encryption (len=100)'
+    )
+    decrypted = Asherah.decrypt(partition_id, json)
+    expect(decrypted).to eq(null_data)
   end
 end
