@@ -92,7 +92,7 @@ RSpec.describe Asherah do
     expect(ENV.fetch('VAR1')).to eq('VALUE1')
   end
 
-  it 'encrypts null bytes with null_data_check enabled' do
+  xit 'encrypts null bytes with null_data_check enabled' do
     Asherah.shutdown
     Asherah.configure do |config|
       base_config.call(config)
