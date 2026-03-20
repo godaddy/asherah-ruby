@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.9.0] - 2026-03-20
+
+- Replace asherah-cobhan with asherah-ffi v0.6.44
+- Remove null_data_check configuration option
+
 ## [0.8.2] - 2026-03-09
 
 - Upgrade to use asherah-cobhan v0.5.3

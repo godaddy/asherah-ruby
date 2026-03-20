@@ -22,7 +22,6 @@ module Asherah
   # @attr [Integer] check_interval, The amount of time in seconds before cached keys are considered stale
   # @attr [Boolean] enable_session_caching, Enable shared session caching
   # @attr [Boolean] disable_zero_copy, Disable zero-copy FFI input buffers to prevent use-after-free from caller runtime
-  # @attr [Boolean] null_data_check, Log an error if input data is all null before or after encryption
   # @attr [Boolean] verbose, Enable verbose logging output
   class Config
     MAPPING = {
@@ -43,7 +42,6 @@ module Asherah
       session_cache_duration: :SessionCacheDuration,
       enable_session_caching: :EnableSessionCaching,
       disable_zero_copy: :DisableZeroCopy,
-      null_data_check: :NullDataCheck,
       expire_after: :ExpireAfter,
       check_interval: :CheckInterval,
       verbose: :Verbose

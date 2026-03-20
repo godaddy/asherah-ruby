@@ -1,6 +1,6 @@
 # Asherah
 
-Asherah is a Ruby FFI wrapper around Go version of [Asherah](https://github.com/godaddy/asherah) application-layer encryption SDK. Asherah provides advanced encryption features and defense in depth against compromise. It uses a technique known as "envelope encryption" and supports cloud-agnostic data storage and key management.
+Asherah is a Ruby FFI wrapper around the Rust version of [Asherah](https://github.com/godaddy/asherah-ffi) application-layer encryption SDK. Asherah provides advanced encryption features and defense in depth against compromise. It uses a technique known as "envelope encryption" and supports cloud-agnostic data storage and key management.
 
 Check out the following documentation to get more familiar with the concepts and configuration options:
 
@@ -45,7 +45,7 @@ Asherah.configure do |config|
 end
 ```
 
-See [config.rb](lib/asherah/config.rb) for all evailable configuration options.
+See [config.rb](lib/asherah/config.rb) for all available configuration options.
 
 Encrypt some data for a `partition_id`
 
@@ -71,7 +71,7 @@ For tests requiring secrets (AWS KMS, database credentials), copy `.env.secrets.
 
 ### Cross-Language Tests
 
-Cross-language tests verify that data encrypted with the Go implementation can be decrypted with the Ruby implementation and vice versa.
+Cross-language tests verify that data encrypted with the Rust implementation can be decrypted with the Ruby implementation and vice versa.
 
 **Prerequisites:**
 - MySQL running locally

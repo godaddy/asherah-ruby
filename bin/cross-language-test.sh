@@ -10,7 +10,7 @@ ASHERAH_GO_TEST_DIR=$(pwd)/tmp/asherah/tests/cross-language/go
 export TEST_DB_NAME=${TEST_DB_NAME:-testdb}
 export TEST_DB_USER=${TEST_DB_USER:-root}
 export TEST_DB_PASSWORD=${TEST_DB_PASSWORD:-}
-export TEST_DB_HOSTNAME=${TEST_DB_HOSTNAME:-localhost}
+export TEST_DB_HOSTNAME=${TEST_DB_HOSTNAME:-127.0.0.1}
 export TEST_DB_PORT=${TEST_DB_PORT:-3306}
 
 # Set Asherah environment variables
