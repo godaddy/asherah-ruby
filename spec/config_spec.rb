@@ -206,7 +206,6 @@ RSpec.describe Asherah::Config do
       config.session_cache_duration = 3600
       config.enable_session_caching = true
       config.disable_zero_copy = true
-      config.null_data_check = true
       config.expire_after = 7200
       config.check_interval = 1800
       config.verbose = true
@@ -231,7 +230,6 @@ RSpec.describe Asherah::Config do
         'SessionCacheDuration' => 3600,
         'EnableSessionCaching' => true,
         'DisableZeroCopy' => true,
-        'NullDataCheck' => true,
         'ExpireAfter' => 7200,
         'CheckInterval' => 1800,
         'Verbose' => true
