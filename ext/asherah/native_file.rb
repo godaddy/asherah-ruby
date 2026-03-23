@@ -4,11 +4,11 @@ require 'open-uri'
 require 'fileutils'
 require 'digest'
 require 'yaml'
-require 'cobhan'
+
+require_relative '../../lib/asherah/platform'
 
 # Downloads native file and verifies checksum
 class NativeFile
-  LIB_NAME = 'libasherah'
   ROOT_DIR = File.expand_path('../../', __dir__)
   CHECKSUMS_FILE = File.expand_path('checksums.yml', __dir__)
   CHECKSUMS = YAML.load_file(CHECKSUMS_FILE)
@@ -18,7 +18,7 @@ class NativeFile
 
   class << self
     def download(
-      file_name: Class.new.extend(Cobhan).library_file_name(LIB_NAME),
+      file_name: Asherah::Platform.library_file_name,
       dir: File.join(ROOT_DIR, 'lib/asherah/native')
     )
       file_path = File.join(dir, file_name)

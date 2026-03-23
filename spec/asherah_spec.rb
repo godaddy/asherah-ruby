@@ -88,7 +88,7 @@ RSpec.describe Asherah do
   it 'can set environment variables' do
     Asherah.set_env('VAR1' => 'VALUE1')
 
-    # ENV set by CGO is visible in Ruby
+    # ENV is set directly in Ruby
     expect(ENV.fetch('VAR1')).to eq('VALUE1')
   end
 end
