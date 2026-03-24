@@ -70,10 +70,7 @@ module Asherah
         @initialized = false
       end
 
-      sessions&.each do |session|
-        session.close unless session.closed?
-      rescue StandardError # rubocop:disable Lint/SuppressedException
-      end
+      sessions&.each { |session| session.close unless session.closed? }
       factory&.close unless factory&.closed?
     end
 
