@@ -15,20 +15,6 @@ module Asherah
   @initialized = false
 
   class << self
-    # Set environment variables needed by Asherah dependencies.
-    #
-    # @param env [Hash] Key-value pairs to set in ENV
-    # @return [void]
-    def set_env(env = {})
-      env.each_pair do |key, value|
-        if value.nil?
-          ENV.delete(String(key))
-        else
-          ENV[String(key)] = value.to_s
-        end
-      end
-    end
-
     # Configures Asherah
     #
     # @yield [Config]

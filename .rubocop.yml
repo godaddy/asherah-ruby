@@ -80,11 +80,6 @@ Style/GuardClause:
   Exclude:
     - 'ext/asherah/native_file.rb'
 
-# Naming cop adjustment
-Naming/AccessorMethodName:
-  Exclude:
-    - 'lib/asherah.rb' # set_env is intentionally named
-
 # Documentation cops
 Style/Documentation:
   Enabled: true

@@ -85,10 +85,4 @@ RSpec.describe Asherah do
     Asherah.configure { |config| base_config.call(config) } # After each work-around
   end
 
-  it 'can set environment variables' do
-    Asherah.set_env('VAR1' => 'VALUE1')
-
-    # ENV is set directly in Ruby
-    expect(ENV.fetch('VAR1')).to eq('VALUE1')
-  end
 end
