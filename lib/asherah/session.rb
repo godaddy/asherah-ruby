@@ -11,7 +11,6 @@ module Asherah
       @pointer = pointer
       @closed = false
       @buffer = Native::AsherahBuffer.new
-      ObjectSpace.define_finalizer(self, self.class.make_finalizer(pointer))
     end
 
     def encrypt_bytes(data)
@@ -41,24 +40,13 @@ module Asherah
     def close
       return if @closed
 
-      ObjectSpace.undefine_finalizer(self)
-      begin
-        Native.asherah_session_free(@pointer)
-      ensure
-        @pointer = FFI::Pointer::NULL
-        @closed = true
-      end
+      Native.asherah_session_free(@pointer)
+      @pointer = FFI::Pointer::NULL
+      @closed = true
     end
 
     def closed?
       @closed
-    end
-
-    def self.make_finalizer(pointer)
-      proc do
-        Native.asherah_session_free(pointer) unless pointer.null?
-      rescue StandardError # rubocop:disable Lint/SuppressedException
-      end
     end
   end
 end
