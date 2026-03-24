@@ -10,30 +10,29 @@ module Asherah
 
       @pointer = pointer
       @closed = false
-      @buffer = Native::AsherahBuffer.new
     end
 
     def encrypt_bytes(data)
       raise Asherah::Error::EncryptFailed, 'session closed' if @closed
 
-      buf = @buffer
-      status = Native.asherah_encrypt_to_json(@pointer, data, data.bytesize, buf.pointer)
+      buffer = Native::AsherahBuffer.new
+      status = Native.asherah_encrypt_to_json(@pointer, data, data.bytesize, buffer.pointer)
       raise Asherah::Error::EncryptFailed, Native.last_error unless status.zero?
 
-      result = buf[:data].read_bytes(buf[:len])
-      Native.asherah_buffer_free(buf.pointer)
+      result = buffer[:data].read_bytes(buffer[:len])
+      Native.asherah_buffer_free(buffer.pointer)
       result
     end
 
     def decrypt_bytes(json)
       raise Asherah::Error::DecryptFailed, 'session closed' if @closed
 
-      buf = @buffer
-      status = Native.asherah_decrypt_from_json(@pointer, json, json.bytesize, buf.pointer)
+      buffer = Native::AsherahBuffer.new
+      status = Native.asherah_decrypt_from_json(@pointer, json, json.bytesize, buffer.pointer)
       raise Asherah::Error::DecryptFailed, Native.last_error unless status.zero?
 
-      result = buf[:data].read_bytes(buf[:len])
-      Native.asherah_buffer_free(buf.pointer)
+      result = buffer[:data].read_bytes(buffer[:len])
+      Native.asherah_buffer_free(buffer.pointer)
       result
     end
 
