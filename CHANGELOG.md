@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.9.1] - 2026-04-23
+
+- Upgrade to use asherah-ffi v0.6.90
+
 ## [0.9.0] - 2026-03-20
 
 - Replace asherah-cobhan with asherah-ffi v0.6.44
