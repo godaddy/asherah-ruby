@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.9.2] - 2026-06-08
+
+- Upgrade to use asherah-ffi v0.6.110
+
 ## [0.9.1] - 2026-04-23
 
 - Upgrade to use asherah-ffi v0.6.90

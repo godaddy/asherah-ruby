@@ -31,13 +31,10 @@ RSpec.describe Asherah do
   end
 
   before :each do
+    Asherah.shutdown if Asherah.instance_variable_get(:@initialized)
     Asherah.configure do |config|
       base_config.call(config)
     end
-  end
-
-  after :each do
-    Asherah.shutdown
   end
 
   it 'has a version number' do
@@ -81,14 +78,12 @@ RSpec.describe Asherah do
     expect {
       Asherah.shutdown
     }.to raise_error(Asherah::Error::NotInitialized)
-
-    Asherah.configure { |config| base_config.call(config) } # After each work-around
   end
 
   it 'can set environment variables' do
-    Asherah.set_env('VAR1' => 'VALUE1')
+    Asherah.shutdown
 
-    # ENV set by CGO is visible in Ruby
+    Asherah.set_env('VAR1' => 'VALUE1')
     expect(ENV.fetch('VAR1')).to eq('VALUE1')
   end
 end
